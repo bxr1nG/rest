@@ -1,0 +1,9 @@
+/db
+/.idea
+
+**/node_modules
+**/build
+
+docker-compose.yml
+
+**/.env*

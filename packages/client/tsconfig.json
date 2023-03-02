@@ -1,0 +1,33 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        /* Modules */
+        "rootDir": "./",
+        "baseUrl": "./src",
+        /* Language and Environment */
+        "target": "ES6",
+        "module": "ESNext",
+        "lib": ["DOM", "DOM.Iterable"],
+        "jsx": "react-jsx",
+        /* Emit */
+        "noEmit": true,
+        /* Interop Constraints */
+        "isolatedModules": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": [
+        "src",
+        "webpack.dev.ts",
+        "webpack.prod.ts",
+        "webpack.common.ts"
+    ],
+    "exclude": ["node_modules", "build", "public"],
+    "ts-node": {
+        "esm": true,
+        "compilerOptions": {
+            "module": "CommonJS"
+        }
+    }
+}
