@@ -6,7 +6,8 @@
     "scripts": {
         "dev": "concurrently \"npm run dev -w client\" \"npm run dev -w server\"",
         "prod": "npm run build && npm run prod -w server",
-        "build": "concurrently \"npm run build -w client\" \"npm run build -w server\""
+        "build": "concurrently \"npm run build -w client\" \"npm run build -w server\"",
+        "prepare": "husky install"
     },
     "keywords": [],
     "author": "",
@@ -27,6 +28,8 @@
         "eslint-plugin-import": "^2.27.5",
         "eslint-plugin-prettier": "^4.2.1",
         "eslint-plugin-react": "^7.32.2",
+        "husky": "^8.0.0",
+        "lint-staged": "^13.1.2",
         "prettier": "^2.8.4",
         "shx": "^0.3.4",
         "ts-node": "^10.9.1",
