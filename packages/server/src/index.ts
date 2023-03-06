@@ -2,13 +2,15 @@ import express, { json } from "express";
 import cors from "cors";
 
 import config from "./config";
-import clientRouter from "./api/client.router";
+import apiRouter from "./routes/api";
+import clientRouter from "./routes/client.router";
 
 const app = express();
 
 app.use(json());
 app.use(cors());
 
+app.use("/api", apiRouter);
 app.use("/", clientRouter);
 
 const server = app.listen(config.port, () => {
