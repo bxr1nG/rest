@@ -2,15 +2,11 @@ import { Router } from "express";
 
 import ErrorHandler from "~/middlewares/ErrorHandler";
 
+import player from "./player/routes";
+
 const router = Router();
 
-router.get("/", (_req, res, next) => {
-    try {
-        res.status(200).json("Hi!");
-    } catch (e) {
-        next(e);
-    }
-});
+router.use("/player", player);
 
 router.use(ErrorHandler);
 
