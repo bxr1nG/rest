@@ -25,6 +25,14 @@ const App: React.FC<AppProps> = () => {
                     path="teams"
                     element={<Players />}
                 />
+                <Route
+                    path="games"
+                    element={<Players />}
+                />
+                <Route
+                    path="venues"
+                    element={<Players />}
+                />
             </Route>
         </Routes>
     );
