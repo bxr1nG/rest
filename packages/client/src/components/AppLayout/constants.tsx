@@ -18,7 +18,7 @@ export const styles: Record<string, React.CSSProperties> = {
         top: 0,
         bottom: 0
     },
-    layout: { marginLeft: 80 }
+    layout: { marginLeft: 80, minHeight: "100vh" }
 };
 
 export const items: MenuProps["items"] = [
