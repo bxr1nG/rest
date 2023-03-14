@@ -1,21 +1,33 @@
-import type { PaginationProps, TableProps } from "antd";
+import type { PaginationProps, TableProps as AntTableProps } from "antd";
 import type { SorterResult } from "antd/es/table/interface";
 
 import React, { useState } from "react";
-import { Layout, theme, Table, Pagination, Input, Button, Space } from "antd";
+import {
+    Layout,
+    theme,
+    Table as AntTable,
+    Pagination,
+    Input,
+    Button,
+    Space
+} from "antd";
+import { ArrowRightOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
+import axios from "axios";
 
-import type Player from "~/types/Player";
-import api from "~/api";
+import type DataObject from "~/types/DataObject";
+import type Data from "~/types/Data";
 
-const { Column } = Table;
+const { Column } = AntTable;
 const { Content } = Layout;
 const { Search } = Input;
 
-type PlayersProps = Record<string, never>;
+type TableProps = Record<string, never>;
 
-const Players: React.FC<PlayersProps> = () => {
+const Table: React.FC<TableProps> = () => {
+    const { table } = useParams();
+
     const [searchParams, setSearchParams] = useSearchParams();
     const parsedSearchParams = {
         page: searchParams.get("page"),
@@ -39,7 +51,7 @@ const Players: React.FC<PlayersProps> = () => {
         order: parsedSearchParams.order ?? undefined
     });
     const { isFetching, data } = useQuery({
-        queryKey: ["players", params],
+        queryKey: [table, params],
         queryFn: async () => {
             setSearchParams({
                 ...{
@@ -50,10 +62,10 @@ const Players: React.FC<PlayersProps> = () => {
                 ...(params.sort ? { sort: params.sort } : {}),
                 ...(params.order ? { order: params.order } : {})
             });
-            const data = await api.players.get({
+            const response = await axios.get(`/api/${table as string}`, {
                 params
             });
-            return data;
+            return response.data as DataObject;
         },
         keepPreviousData: true
     });
@@ -77,12 +89,12 @@ const Players: React.FC<PlayersProps> = () => {
         setParams((prevState) => ({ ...prevState, search: value, page: 0 }));
     };
 
-    const onTableChange: TableProps<Player>["onChange"] = (
+    const onTableChange: AntTableProps<Data>["onChange"] = (
         _pagination,
         _filters,
         sorter
     ) => {
-        const { order, field, column } = sorter as SorterResult<Player>;
+        const { order, field, column } = sorter as SorterResult<Data>;
         setParams((prevState) => ({
             ...prevState,
             sort: column ? (field as string) : undefined,
@@ -105,19 +117,12 @@ const Players: React.FC<PlayersProps> = () => {
     const [inputValue, setInputValue] = useState("");
 
     return (
-        <Content
-            style={{
-                padding: "24px 16px",
-                maxHeight: "100vh",
-                overflow: "hidden"
-            }}
-        >
-            <div
+        <Layout style={{ height: "100vh", width: "100vw" }}>
+            <Content
                 style={{
+                    margin: "24px 16px",
                     padding: 24,
                     background: colorBgContainer,
-                    width: "100%",
-                    maxHeight: "100%",
                     display: "flex",
                     flexDirection: "column",
                     gap: 16
@@ -127,6 +132,14 @@ const Players: React.FC<PlayersProps> = () => {
                     direction="horizontal"
                     size="middle"
                 >
+                    <Link to="/">
+                        <Button
+                            type="primary"
+                            icon={<ArrowLeftOutlined />}
+                        >
+                            Home
+                        </Button>
+                    </Link>
                     <Search
                         placeholder="Search by name"
                         defaultValue={params.search}
@@ -137,84 +150,46 @@ const Players: React.FC<PlayersProps> = () => {
                     />
                     <Button onClick={onButtonClick}>Reset all</Button>
                 </Space>
-                <div style={{ overflow: "scroll" }}>
-                    <Table
-                        dataSource={data?.data}
-                        pagination={false}
-                        rowKey="id"
-                        loading={isFetching}
-                        onChange={onTableChange}
-                    >
+                <AntTable
+                    dataSource={data?.data}
+                    pagination={false}
+                    rowKey="id"
+                    loading={isFetching}
+                    onChange={onTableChange}
+                    style={{ overflow: "scroll" }}
+                >
+                    {Object.keys(data?.data[0] ?? {}).map((column) => (
                         <Column
-                            title="First Name"
-                            dataIndex="first_name"
-                            key="first_name"
+                            title={column}
+                            dataIndex={column}
+                            key={column}
                             sorter
                             sortOrder={
-                                params.sort === "first_name"
+                                params.sort === column
                                     ? params.order === "ASC"
                                         ? "ascend"
                                         : "descend"
                                     : undefined
                             }
                         />
-                        <Column
-                            title="Last Name"
-                            dataIndex="last_name"
-                            key="last_name"
-                            sorter
-                            sortOrder={
-                                params.sort === "last_name"
-                                    ? params.order === "ASC"
-                                        ? "ascend"
-                                        : "descend"
-                                    : undefined
-                            }
-                        />
-                        <Column
-                            title="Middle Name"
-                            dataIndex="middle_name"
-                            key="middle_name"
-                            sorter
-                            sortOrder={
-                                params.sort === "middle_name"
-                                    ? params.order === "ASC"
-                                        ? "ascend"
-                                        : "descend"
-                                    : undefined
-                            }
-                        />
-                        <Column
-                            title="Birth Date"
-                            dataIndex="birth_date"
-                            key="birth_date"
-                            sorter
-                            sortOrder={
-                                params.sort === "birth_date"
-                                    ? params.order === "ASC"
-                                        ? "ascend"
-                                        : "descend"
-                                    : undefined
-                            }
-                            render={(date: string) => (
-                                <>{new Date(date).toLocaleDateString()}</>
-                            )}
-                        />
-                        <Column
-                            title="Position"
-                            dataIndex="position"
-                            key="position"
-                            sorter
-                            sortOrder={
-                                params.sort === "position"
-                                    ? params.order === "ASC"
-                                        ? "ascend"
-                                        : "descend"
-                                    : undefined
-                            }
-                        />
-                    </Table>
-                </div>
+                    ))}
+                    <Column
+                        render={(value) => {
+                            return (
+                                <Link
+                                    to={`/${table as string}/${
+                                        (value as Data)["id"]
+                                    }`}
+                                >
+                                    <Button
+                                        shape="circle"
+                                        icon={<ArrowRightOutlined />}
+                                    />
+                                </Link>
+                            );
+                        }}
+                    />
+                </AntTable>
                 <Pagination
                     showSizeChanger
                     onShowSizeChange={onShowSizeChange}
@@ -223,9 +198,9 @@ const Players: React.FC<PlayersProps> = () => {
                     onChange={onPaginationChange}
                     total={data?.count}
                 />
-            </div>
-        </Content>
+            </Content>
+        </Layout>
     );
 };
 
-export default Players;
+export default Table;
