@@ -105,36 +105,39 @@ const Players: React.FC<PlayersProps> = () => {
     const [inputValue, setInputValue] = useState("");
 
     return (
-        <>
-            <Content
+        <Content
+            style={{
+                padding: "24px 16px",
+                maxHeight: "100vh",
+                overflow: "hidden"
+            }}
+        >
+            <div
                 style={{
-                    margin: "24px 16px"
+                    padding: 24,
+                    background: colorBgContainer,
+                    width: "100%",
+                    maxHeight: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 16
                 }}
             >
                 <Space
-                    direction="vertical"
+                    direction="horizontal"
                     size="middle"
-                    style={{
-                        padding: 24,
-                        background: colorBgContainer,
-                        width: "100%"
-                    }}
                 >
-                    <Space
-                        direction="horizontal"
-                        size="middle"
-                    >
-                        <Search
-                            placeholder="Search by name"
-                            defaultValue={params.search}
-                            allowClear
-                            onSearch={onSearch}
-                            style={{ maxWidth: 400 }}
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                        />
-                        <Button onClick={onButtonClick}>Reset all</Button>
-                    </Space>
+                    <Search
+                        placeholder="Search by name"
+                        defaultValue={params.search}
+                        allowClear
+                        onSearch={onSearch}
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                    />
+                    <Button onClick={onButtonClick}>Reset all</Button>
+                </Space>
+                <div style={{ overflow: "scroll" }}>
                     <Table
                         dataSource={data?.data}
                         pagination={false}
@@ -193,6 +196,9 @@ const Players: React.FC<PlayersProps> = () => {
                                         : "descend"
                                     : undefined
                             }
+                            render={(date: string) => (
+                                <>{new Date(date).toLocaleDateString()}</>
+                            )}
                         />
                         <Column
                             title="Position"
@@ -207,31 +213,18 @@ const Players: React.FC<PlayersProps> = () => {
                                     : undefined
                             }
                         />
-                        <Column
-                            title="Force Refresh"
-                            dataIndex="force_refresh"
-                            key="force_refresh"
-                            sorter
-                            sortOrder={
-                                params.sort === "force_refresh"
-                                    ? params.order === "ASC"
-                                        ? "ascend"
-                                        : "descend"
-                                    : undefined
-                            }
-                        />
                     </Table>
-                    <Pagination
-                        showSizeChanger
-                        onShowSizeChange={onShowSizeChange}
-                        pageSize={params.limit}
-                        current={params.page + 1}
-                        onChange={onPaginationChange}
-                        total={data?.count}
-                    />
-                </Space>
-            </Content>
-        </>
+                </div>
+                <Pagination
+                    showSizeChanger
+                    onShowSizeChange={onShowSizeChange}
+                    pageSize={params.limit}
+                    current={params.page + 1}
+                    onChange={onPaginationChange}
+                    total={data?.count}
+                />
+            </div>
+        </Content>
     );
 };
 
