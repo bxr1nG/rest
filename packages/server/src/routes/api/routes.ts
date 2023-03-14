@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import type Params from "~/types/Params";
+import ErrorHandler from "~/middlewares/ErrorHandler";
 
 import controllers from "./controllers";
 
@@ -19,5 +20,7 @@ router
             .then((result) => res.status(200).json(result))
             .catch((error) => next(error));
     });
+
+router.use(ErrorHandler);
 
 export default router;
