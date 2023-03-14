@@ -1,4 +1,4 @@
-type PlayerGetAllParams = {
+type Params = {
     page: string | undefined;
     limit: string | undefined;
     sort: string | undefined;
@@ -6,4 +6,4 @@ type PlayerGetAllParams = {
     search: string | undefined;
 };
 
-export default PlayerGetAllParams;
+export default Params;
