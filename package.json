@@ -10,6 +10,11 @@
         "release-patch": "standard-version --release-as patch",
         "release-minor": "standard-version --release-as minor",
         "release-major": "standard-version --release-as major",
+        "deploy": "npm run docker-build && npm run docker-push",
+        "docker-build": "cross-env-shell docker build -t bxr1ng/$npm_package_name:$npm_package_version -t bxr1ng/$npm_package_name:latest .",
+        "docker-push": "npm run docker-push-version && npm run docker-push-latest",
+        "docker-push-version": "cross-env-shell docker push bxr1ng/$npm_package_name:$npm_package_version",
+        "docker-push-latest": "cross-env-shell docker push bxr1ng/$npm_package_name:latest",
         "cm": "cz",
         "prepare": "husky install"
     },

@@ -4,6 +4,6 @@
 **/node_modules
 **/build
 
-docker-compose.yml
+docker-compose.y*ml
 
 **/.env*
