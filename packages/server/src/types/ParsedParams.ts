@@ -1,4 +1,4 @@
-import type Rows from "~/types/Rows";
+import type Rows from "./Rows";
 
 type ParsedParams = {
     page: number;
@@ -6,6 +6,7 @@ type ParsedParams = {
     sort: keyof Rows;
     order: "ASC" | "DESC";
     search: string;
+    fields: Array<keyof Rows>;
 };
 
 export default ParsedParams;

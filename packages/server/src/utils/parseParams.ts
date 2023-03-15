@@ -8,7 +8,8 @@ const parseParams = (query: Params): ParsedParams => ({
     order: (query.order && ["ASC", "DESC"].includes(query.order)
         ? query.order
         : "ASC ") as "ASC" | "DESC",
-    search: query.search || ""
+    search: query.search || "",
+    fields: ["id"]
 });
 
 export default parseParams;
