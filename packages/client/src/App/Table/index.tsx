@@ -141,6 +141,7 @@ const Table: React.FC<TableProps> = () => {
                 loading={isFetching}
                 onChange={onTableChange}
                 style={styles.table}
+                sticky
             >
                 {Object.keys(data?.data[0] ?? {}).map((column) => (
                     <Column
@@ -148,6 +149,7 @@ const Table: React.FC<TableProps> = () => {
                         dataIndex={column}
                         key={column}
                         sorter
+                        showSorterTooltip={false}
                         sortOrder={
                             params.sort === column
                                 ? params.order === "ASC"

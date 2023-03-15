@@ -12,7 +12,9 @@ const services = {
             data: (await db.execute<Data[]>(queries.getAll(table, params)))[0],
             count: (
                 (
-                    await db.execute<Count[]>(queries.getAllCount(table))
+                    await db.execute<Count[]>(
+                        queries.getAllCount(table, params)
+                    )
                 )[0][0] as CountRows
             )["COUNT(*)"]
         };

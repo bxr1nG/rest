@@ -9,7 +9,7 @@ const parseParams = (query: Params): ParsedParams => ({
         ? query.order
         : "ASC ") as "ASC" | "DESC",
     search: query.search || "",
-    fields: ["id"]
+    fields: query.fields || ["id"]
 });
 
 export default parseParams;
