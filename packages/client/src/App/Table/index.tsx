@@ -2,15 +2,7 @@ import type { PaginationProps, TableProps as AntTableProps } from "antd";
 import type { SorterResult } from "antd/es/table/interface";
 
 import React, { useState } from "react";
-import {
-    Layout,
-    theme,
-    Table as AntTable,
-    Pagination,
-    Input,
-    Button,
-    Space
-} from "antd";
+import { Table as AntTable, Pagination, Input, Button, Space } from "antd";
 import { ArrowRightOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useSearchParams, Link } from "react-router-dom";
@@ -18,15 +10,17 @@ import axios from "axios";
 
 import type DataObject from "~/types/DataObject";
 import type Data from "~/types/Data";
+import Wrapper from "~/components/Wrapper";
+
+import { styles } from "./constants";
 
 const { Column } = AntTable;
-const { Content } = Layout;
 const { Search } = Input;
 
 type TableProps = Record<string, never>;
 
 const Table: React.FC<TableProps> = () => {
-    const { table } = useParams();
+    const { table } = useParams() as { table: string };
 
     const [searchParams, setSearchParams] = useSearchParams();
     const parsedSearchParams = {
@@ -62,17 +56,17 @@ const Table: React.FC<TableProps> = () => {
                 ...(params.sort ? { sort: params.sort } : {}),
                 ...(params.order ? { order: params.order } : {})
             });
-            const response = await axios.get(`/api/${table as string}`, {
-                params
+            const fields: Array<string> = Object.keys(data?.data[0] ?? {});
+            const response = await axios.get(`/api/${table}`, {
+                params: {
+                    ...params,
+                    fields
+                }
             });
             return response.data as DataObject;
         },
         keepPreviousData: true
     });
-
-    const {
-        token: { colorBgContainer }
-    } = theme.useToken();
 
     const onPaginationChange: PaginationProps["onChange"] = (page) => {
         setParams((prevState) => ({ ...prevState, page: page - 1 }));
@@ -103,7 +97,7 @@ const Table: React.FC<TableProps> = () => {
         }));
     };
 
-    const onButtonClick = () => {
+    const onResetAll = () => {
         setParams((prevState) => ({
             ...prevState,
             search: "",
@@ -111,95 +105,81 @@ const Table: React.FC<TableProps> = () => {
             order: undefined,
             sort: undefined
         }));
-        setInputValue("");
+        setSearchValue("");
     };
 
-    const [inputValue, setInputValue] = useState("");
+    const [searchValue, setSearchValue] = useState("");
 
     return (
-        <Layout style={{ height: "100vh", width: "100vw" }}>
-            <Content
-                style={{
-                    margin: "24px 16px",
-                    padding: 24,
-                    background: colorBgContainer,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 16
-                }}
+        <Wrapper>
+            <Space
+                direction="horizontal"
+                size="middle"
             >
-                <Space
-                    direction="horizontal"
-                    size="middle"
-                >
-                    <Link to="/">
-                        <Button
-                            type="primary"
-                            icon={<ArrowLeftOutlined />}
-                        >
-                            Home
-                        </Button>
-                    </Link>
-                    <Search
-                        placeholder="Search by name"
-                        defaultValue={params.search}
-                        allowClear
-                        onSearch={onSearch}
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                    />
-                    <Button onClick={onButtonClick}>Reset all</Button>
-                </Space>
-                <AntTable
-                    dataSource={data?.data}
-                    pagination={false}
-                    rowKey="id"
-                    loading={isFetching}
-                    onChange={onTableChange}
-                    style={{ overflow: "scroll" }}
-                >
-                    {Object.keys(data?.data[0] ?? {}).map((column) => (
-                        <Column
-                            title={column}
-                            dataIndex={column}
-                            key={column}
-                            sorter
-                            sortOrder={
-                                params.sort === column
-                                    ? params.order === "ASC"
-                                        ? "ascend"
-                                        : "descend"
-                                    : undefined
-                            }
-                        />
-                    ))}
-                    <Column
-                        render={(value) => {
-                            return (
-                                <Link
-                                    to={`/${table as string}/${
-                                        (value as Data)["id"]
-                                    }`}
-                                >
-                                    <Button
-                                        shape="circle"
-                                        icon={<ArrowRightOutlined />}
-                                    />
-                                </Link>
-                            );
-                        }}
-                    />
-                </AntTable>
-                <Pagination
-                    showSizeChanger
-                    onShowSizeChange={onShowSizeChange}
-                    pageSize={params.limit}
-                    current={params.page + 1}
-                    onChange={onPaginationChange}
-                    total={data?.count}
+                <Link to="/">
+                    <Button
+                        type="primary"
+                        icon={<ArrowLeftOutlined />}
+                    >
+                        Home
+                    </Button>
+                </Link>
+                <Search
+                    placeholder="Search"
+                    defaultValue={params.search}
+                    allowClear
+                    onSearch={onSearch}
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
                 />
-            </Content>
-        </Layout>
+                <Button onClick={onResetAll}>Reset all</Button>
+            </Space>
+            <AntTable
+                dataSource={data?.data}
+                pagination={false}
+                rowKey="id"
+                loading={isFetching}
+                onChange={onTableChange}
+                style={styles.table}
+            >
+                {Object.keys(data?.data[0] ?? {}).map((column) => (
+                    <Column
+                        title={column}
+                        dataIndex={column}
+                        key={column}
+                        sorter
+                        sortOrder={
+                            params.sort === column
+                                ? params.order === "ASC"
+                                    ? "ascend"
+                                    : "descend"
+                                : undefined
+                        }
+                    />
+                ))}
+                <Column
+                    render={({ id }: Data) => {
+                        return (
+                            <Link to={`/${table}/${id}`}>
+                                <Button
+                                    shape="circle"
+                                    icon={<ArrowRightOutlined />}
+                                />
+                            </Link>
+                        );
+                    }}
+                />
+            </AntTable>
+            <Pagination
+                showSizeChanger
+                onShowSizeChange={onShowSizeChange}
+                pageSize={params.limit}
+                current={params.page + 1}
+                onChange={onPaginationChange}
+                total={data?.count}
+                style={styles.pagination}
+            />
+        </Wrapper>
     );
 };
 
