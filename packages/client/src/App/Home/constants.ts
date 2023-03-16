@@ -5,6 +5,6 @@ export const styles: Record<string, CSSProperties> = {
         maxWidth: 150
     },
     inputNumber: {
-        maxWidth: 110
+        maxWidth: 100
     }
 };

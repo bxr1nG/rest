@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Button, Input, InputNumber, Space } from "antd";
+import React from "react";
+import { Button, Form, Input, Space, Switch } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
@@ -9,40 +9,60 @@ import { styles } from "./constants";
 
 const { Compact } = Space;
 
-type HomeProps = Record<string, never>;
+type HomeProps = {
+    handleThemeChange: () => void;
+    isDarkMode: boolean;
+};
 
-const Home: React.FC<HomeProps> = () => {
+const Home: React.FC<HomeProps> = (props) => {
+    const { handleThemeChange, isDarkMode } = props;
+
     const navigate = useNavigate();
 
-    const [table, setTable] = useState("");
-    const [id, setId] = useState<string | null>(null);
-
-    const onClick = () => {
+    const onFinish = (values: { table: string; id: string | undefined }) => {
+        const { table, id } = values;
         navigate(id ? `/${table}/${id}` : `/${table}`);
     };
 
     return (
         <Wrapper center>
-            <Compact>
-                <Input
-                    placeholder="table"
-                    value={table}
-                    onChange={(e) => setTable(e.target.value)}
-                    style={styles.input}
-                />
-                <InputNumber
-                    placeholder="id"
-                    value={id}
-                    onChange={(value) => setId(value)}
-                    style={styles.inputNumber}
-                />
-                <Button
-                    disabled={table === ""}
-                    type="primary"
-                    icon={<SearchOutlined />}
-                    onClick={onClick}
-                />
-            </Compact>
+            <Switch
+                checkedChildren={"Dark Theme"}
+                unCheckedChildren={"Light Theme"}
+                checked={isDarkMode}
+                onChange={handleThemeChange}
+            />
+            <Form
+                onFinish={onFinish}
+                autoComplete="off"
+            >
+                <Compact>
+                    <Form.Item
+                        name="table"
+                        rules={[
+                            { required: true, message: "Table name required" }
+                        ]}
+                    >
+                        <Input
+                            placeholder="table"
+                            style={styles.input}
+                        />
+                    </Form.Item>
+                    <Form.Item name="id">
+                        <Input
+                            placeholder="id"
+                            style={styles.inputNumber}
+                        />
+                    </Form.Item>
+                    <Form.Item>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            icon={<SearchOutlined />}
+                        />
+                    </Form.Item>
+                </Compact>
+            </Form>
         </Wrapper>
     );
 };
