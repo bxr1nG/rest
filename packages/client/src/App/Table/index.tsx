@@ -141,11 +141,14 @@ const Table: React.FC<TableProps> = () => {
                 loading={isFetching}
                 onChange={onTableChange}
                 style={styles.table}
-                sticky
             >
                 {Object.keys(data?.data[0] ?? {}).map((column) => (
                     <Column
-                        title={column}
+                        title={column
+                            .replace(/_/g, " ")
+                            .replace(/(^\w)|(\s+\w)/g, (letter) =>
+                                letter.toUpperCase()
+                            )}
                         dataIndex={column}
                         key={column}
                         sorter
