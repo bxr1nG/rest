@@ -2,24 +2,28 @@ import type { PaginationProps, TableProps as AntTableProps } from "antd";
 import type { SorterResult } from "antd/es/table/interface";
 
 import React, { useState } from "react";
-import { Table as AntTable, Pagination, Input, Button, Space } from "antd";
-import { ArrowRightOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { Table as AntTable, Pagination, Button } from "antd";
+import { ArrowRightOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
 
 import type DataObject from "~/types/DataObject";
 import type Data from "~/types/Data";
+import type Params from "~/types/Params";
 import Wrapper from "~/components/Wrapper";
+import useViewport from "~/hooks/useViewport";
 
 import { styles } from "./constants";
+import Controllers from "./Controllers";
 
 const { Column } = AntTable;
-const { Search } = Input;
 
 type TableProps = Record<string, never>;
 
 const Table: React.FC<TableProps> = () => {
+    const { isMobile } = useViewport();
+
     const { table } = useParams() as { table: string };
 
     const [searchParams, setSearchParams] = useSearchParams();
@@ -30,29 +34,23 @@ const Table: React.FC<TableProps> = () => {
         sort: searchParams.get("sort"),
         order: searchParams.get("order")
     };
-
-    const [params, setParams] = useState<{
-        page: number;
-        limit: number;
-        search: string;
-        sort: string | undefined;
-        order: string | undefined;
-    }>({
+    const [params, setParams] = useState<Params>({
         page: parsedSearchParams.page ? +parsedSearchParams.page : 0,
         limit: parsedSearchParams.limit ? +parsedSearchParams.limit : 10,
-        search: parsedSearchParams.search ?? "",
+        search: parsedSearchParams.search ?? undefined,
         sort: parsedSearchParams.sort ?? undefined,
         order: parsedSearchParams.order ?? undefined
     });
+
     const { isFetching, data } = useQuery({
         queryKey: [table, params],
         queryFn: async () => {
             setSearchParams({
                 ...{
                     page: params.page.toString(),
-                    limit: params.limit.toString(),
-                    search: params.search
+                    limit: params.limit.toString()
                 },
+                ...(params.search ? { search: params.search } : {}),
                 ...(params.sort ? { sort: params.sort } : {}),
                 ...(params.order ? { order: params.order } : {})
             });
@@ -79,10 +77,6 @@ const Table: React.FC<TableProps> = () => {
         setParams((prevState) => ({ ...prevState, limit: pageSize, page: 0 }));
     };
 
-    const onSearch = (value: string) => {
-        setParams((prevState) => ({ ...prevState, search: value, page: 0 }));
-    };
-
     const onTableChange: AntTableProps<Data>["onChange"] = (
         _pagination,
         _filters,
@@ -97,43 +91,12 @@ const Table: React.FC<TableProps> = () => {
         }));
     };
 
-    const onResetAll = () => {
-        setParams((prevState) => ({
-            ...prevState,
-            search: "",
-            page: 0,
-            order: undefined,
-            sort: undefined
-        }));
-        setSearchValue("");
-    };
-
-    const [searchValue, setSearchValue] = useState("");
-
     return (
         <Wrapper>
-            <Space
-                direction="horizontal"
-                size="middle"
-            >
-                <Link to="/">
-                    <Button
-                        type="primary"
-                        icon={<ArrowLeftOutlined />}
-                    >
-                        Home
-                    </Button>
-                </Link>
-                <Search
-                    placeholder="Search"
-                    defaultValue={params.search}
-                    allowClear
-                    onSearch={onSearch}
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                />
-                <Button onClick={onResetAll}>Reset all</Button>
-            </Space>
+            <Controllers
+                params={params}
+                setParams={setParams}
+            />
             <AntTable
                 dataSource={data?.data}
                 pagination={false}
@@ -141,6 +104,7 @@ const Table: React.FC<TableProps> = () => {
                 loading={isFetching}
                 onChange={onTableChange}
                 style={styles.table}
+                size={isMobile ? "small" : "large"}
             >
                 {Object.keys(data?.data[0] ?? {}).map((column) => (
                     <Column
@@ -151,8 +115,8 @@ const Table: React.FC<TableProps> = () => {
                             )}
                         dataIndex={column}
                         key={column}
-                        sorter
                         showSorterTooltip={false}
+                        sorter
                         sortOrder={
                             params.sort === column
                                 ? params.order === "ASC"
@@ -163,16 +127,14 @@ const Table: React.FC<TableProps> = () => {
                     />
                 ))}
                 <Column
-                    render={({ id }: Data) => {
-                        return (
-                            <Link to={`/${table}/${id}`}>
-                                <Button
-                                    shape="circle"
-                                    icon={<ArrowRightOutlined />}
-                                />
-                            </Link>
-                        );
-                    }}
+                    render={({ id }: Data) => (
+                        <Link to={`/${table}/${id}`}>
+                            <Button
+                                shape="circle"
+                                icon={<ArrowRightOutlined />}
+                            />
+                        </Link>
+                    )}
                 />
             </AntTable>
             <Pagination
@@ -182,7 +144,10 @@ const Table: React.FC<TableProps> = () => {
                 current={params.page + 1}
                 onChange={onPaginationChange}
                 total={data?.count}
-                style={styles.pagination}
+                style={
+                    isMobile ? styles.paginationCenter : styles.paginationEnd
+                }
+                simple={isMobile}
             />
         </Wrapper>
     );

@@ -7,6 +7,7 @@ import axios from "axios";
 
 import type Data from "~/types/Data";
 import Wrapper from "~/components/Wrapper";
+import useViewport from "~/hooks/useViewport";
 
 import { styles } from "./constants";
 
@@ -15,6 +16,8 @@ const { Column } = Table;
 type IdProps = Record<string, never>;
 
 const Id: React.FC<IdProps> = () => {
+    const { isMobile } = useViewport();
+
     const { table, id } = useParams() as { table: string; id: string };
     const navigate = useNavigate();
 
@@ -41,7 +44,7 @@ const Id: React.FC<IdProps> = () => {
                 }}
                 style={styles.button}
             >
-                Back
+                {isMobile ? "" : "Back"}
             </Button>
             <Table
                 dataSource={data}
@@ -49,6 +52,7 @@ const Id: React.FC<IdProps> = () => {
                 rowKey="name"
                 loading={isFetching}
                 style={styles.table}
+                size={isMobile ? "small" : "large"}
             >
                 {Object.keys(data ? (data[0] ? data[0] : {}) : {}).map(
                     (column) => (
