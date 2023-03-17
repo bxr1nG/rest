@@ -4,6 +4,8 @@ import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "antd/dist/reset.css";
 
+import ViewportProvider from "~/utils/ViewportProvider";
+
 import App from "./App";
 
 const queryClient = new QueryClient({
@@ -21,7 +23,9 @@ root.render(
     <React.StrictMode>
         <BrowserRouter>
             <QueryClientProvider client={queryClient}>
-                <App />
+                <ViewportProvider>
+                    <App />
+                </ViewportProvider>
             </QueryClientProvider>
         </BrowserRouter>
     </React.StrictMode>
