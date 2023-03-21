@@ -5,12 +5,19 @@ class Query<T extends Rows> {
     private readonly conditions: Array<[string, Array<T[keyof T]>]>;
     private readonly orders: Array<[keyof T, "asc" | "desc"]>;
     private interval: [number, number] | undefined;
+    private readonly includes: Array<{
+        sourceColumn: keyof Rows;
+        targetTable: string;
+        targetColumn: keyof Rows;
+        alias: string;
+    }>;
 
     constructor(table: string) {
         this.table = table;
 
         this.conditions = [];
         this.orders = [];
+        this.includes = [];
     }
 
     where(expression: string, values: Array<T[keyof T]>) {
@@ -28,6 +35,16 @@ class Query<T extends Rows> {
         return this;
     }
 
+    include(params: {
+        sourceColumn: keyof Rows;
+        targetTable: string;
+        targetColumn: keyof Rows;
+        alias: string;
+    }) {
+        this.includes.push(params);
+        return this;
+    }
+
     build() {
         return {
             source: {
@@ -36,7 +53,8 @@ class Query<T extends Rows> {
             criteria: {
                 where: this.conditions,
                 order: this.orders,
-                range: this.interval
+                range: this.interval,
+                include: this.includes
             }
         };
     }

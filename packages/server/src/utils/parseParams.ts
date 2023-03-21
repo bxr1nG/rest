@@ -11,6 +11,14 @@ const parseParams = (query: Params): ParsedParams => ({
         : undefined,
     filter: query.filter
         ? (JSON.parse(query.filter) as Array<[string, Array<string>]>)
+        : undefined,
+    include: query.include
+        ? (JSON.parse(query.include) as Array<{
+              sourceColumn: keyof Rows;
+              targetTable: string;
+              targetColumn: keyof Rows;
+              alias: string;
+          }>)
         : undefined
 });
 

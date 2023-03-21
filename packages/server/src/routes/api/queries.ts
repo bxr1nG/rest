@@ -18,6 +18,9 @@ const queries = {
             const [limit, offset] = params.range;
             builder.range(limit, offset);
         }
+        if (params.include) {
+            params.include.forEach((include) => builder.include(include));
+        }
 
         const query = builder.build();
         return await ORM.select(query.source, query.criteria);

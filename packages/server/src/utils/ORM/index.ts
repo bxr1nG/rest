@@ -14,7 +14,7 @@ class ORM {
         return query;
     }
 
-    static async select<T extends Data>(
+    static async select<T extends Data & Record<string, Data>>(
         source: QuerySource,
         criteria?: QueryCriteria
     ) {
@@ -22,8 +22,30 @@ class ORM {
         if (criteria) {
             query = `${query} ${this.parseCriteria(criteria)}`;
         }
-        const result = await db.execute<T[]>(query);
-        return result[0];
+        let result = (await db.execute<T[]>(query))[0];
+
+        if (criteria && criteria.include) {
+            result = result.map((row) => {
+                criteria.include.map(async (include) => {
+                    const subquery = ORM.for(include.targetTable)
+                        .where("? = ?", [
+                            include.targetColumn,
+                            row[include.sourceColumn] as T[keyof T]
+                        ])
+                        .build();
+                    const subresult = await ORM.select(
+                        subquery.source,
+                        subquery.criteria
+                    );
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    row[include.alias] = subresult[0];
+                });
+                return row;
+            });
+        }
+
+        return result;
     }
 
     static async selectCount(source: QuerySource, criteria?: QueryCriteria) {
@@ -31,8 +53,10 @@ class ORM {
         if (criteria) {
             query = `${query} ${this.parseCriteria(criteria)}`;
         }
-        const result = await db.execute<Count[]>(query);
-        return (result[0][0] as CountRows)["COUNT(*)"];
+        const result = ((await db.execute<Count[]>(query))[0][0] as CountRows)[
+            "COUNT(*)"
+        ];
+        return result;
     }
 
     private static parseCriteria(criteria: QueryCriteria): string {
