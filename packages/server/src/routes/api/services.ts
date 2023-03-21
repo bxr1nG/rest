@@ -1,26 +1,16 @@
-import type Data from "~/types/Data";
 import type ParsedParams from "~/types/ParsedParams";
-import type Count from "~/types/Count";
-import type CountRows from "~/types/CountRows";
-import db from "~/db";
 
 import queries from "./queries";
 
 const services = {
     getAll: async (table: string, params: ParsedParams) => {
         return {
-            data: (await db.execute<Data[]>(queries.getAll(table, params)))[0],
-            count: (
-                (
-                    await db.execute<Count[]>(
-                        queries.getAllCount(table, params)
-                    )
-                )[0][0] as CountRows
-            )["COUNT(*)"]
+            data: await queries.getAll(table, params),
+            count: await queries.getAllCount(table, params)
         };
     },
-    getById: async (table: string, id: number) => {
-        return (await db.execute<Data[]>(queries.getById(table, id)))[0];
+    getById: async (table: string, id: string) => {
+        return await queries.getById(table, id);
     }
 };
 

@@ -1,12 +1,7 @@
-import type Rows from "./Rows";
-
 type Params = {
-    page?: string;
-    limit?: string;
+    range?: string;
     sort?: string;
-    order?: string;
-    search?: string;
-    fields?: Array<keyof Rows>;
+    filter?: string;
 };
 
 export default Params;

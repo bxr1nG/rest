@@ -1,15 +1,17 @@
 import type Params from "~/types/Params";
 import type ParsedParams from "~/types/ParsedParams";
+import type Rows from "~/types/Rows";
 
 const parseParams = (query: Params): ParsedParams => ({
-    page: +(query.page || 0),
-    limit: +(query.limit || 10),
-    sort: query.sort ?? "id",
-    order: (query.order && ["ASC", "DESC"].includes(query.order)
-        ? query.order
-        : "ASC ") as "ASC" | "DESC",
-    search: query.search || "",
-    fields: query.fields || ["id"]
+    range: query.range
+        ? (JSON.parse(query.range) as [number, number])
+        : undefined,
+    sort: query.sort
+        ? (JSON.parse(query.sort) as Array<[keyof Rows, "asc" | "desc"]>)
+        : undefined,
+    filter: query.filter
+        ? (JSON.parse(query.filter) as Array<[string, Array<string>]>)
+        : undefined
 });
 
 export default parseParams;

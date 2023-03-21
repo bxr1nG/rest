@@ -16,7 +16,7 @@ router
     })
     .get("/:table/:id", (req, res, next) => {
         controllers
-            .getById(req.params.table, +req.params.id)
+            .getById(req.params.table, req.params.id)
             .then((result) => res.status(200).json(result))
             .catch((error) => next(error));
     });

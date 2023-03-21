@@ -9,7 +9,7 @@ const controllers = {
         const params = parseParams(query);
         return services.getAll(table, params);
     },
-    getById: async (table: string, id: number) => {
+    getById: async (table: string, id: string) => {
         const player = await services.getById(table, id);
         if (player.length !== 1) {
             throw new NotFoundError();

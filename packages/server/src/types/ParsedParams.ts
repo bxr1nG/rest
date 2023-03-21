@@ -1,12 +1,9 @@
 import type Rows from "./Rows";
 
 type ParsedParams = {
-    page: number;
-    limit: number;
-    sort: keyof Rows;
-    order: "ASC" | "DESC";
-    search: string;
-    fields: Array<keyof Rows>;
+    range?: [number, number];
+    sort?: Array<[keyof Rows, "asc" | "desc"]>;
+    filter?: Array<[string, Array<string | number | Date>]>;
 };
 
 export default ParsedParams;
