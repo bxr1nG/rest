@@ -1,6 +1,7 @@
 import type Params from "~/types/Params";
 import type ParsedParams from "~/types/ParsedParams";
 import type Rows from "~/types/Rows";
+import type Include from "~/types/ORM/Include";
 
 const parseParams = (query: Params): ParsedParams => ({
     range: query.range
@@ -13,12 +14,10 @@ const parseParams = (query: Params): ParsedParams => ({
         ? (JSON.parse(query.filter) as Array<[string, Array<string>]>)
         : undefined,
     include: query.include
-        ? (JSON.parse(query.include) as Array<{
-              sourceColumn: keyof Rows;
-              targetTable: string;
-              targetColumn: keyof Rows;
-              alias: string;
-          }>)
+        ? (JSON.parse(query.include) as Array<Include>)
+        : undefined,
+    includeMany: query.includeMany
+        ? (JSON.parse(query.includeMany) as Array<Include>)
         : undefined
 });
 

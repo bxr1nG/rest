@@ -4,24 +4,7 @@ import ORM from "~/utils/ORM";
 const queries = {
     getAll: async (table: string, params: ParsedParams) => {
         const builder = ORM.for(table);
-        if (params.filter) {
-            params.filter.forEach(([expression, values]) =>
-                builder.where(expression, values)
-            );
-        }
-        if (params.sort) {
-            params.sort.forEach(([column, order]) =>
-                builder.order(column, order)
-            );
-        }
-        if (params.range) {
-            const [limit, offset] = params.range;
-            builder.range(limit, offset);
-        }
-        if (params.include) {
-            params.include.forEach((include) => builder.include(include));
-        }
-
+        ORM.connectParams(builder, params);
         const query = builder.build();
         return await ORM.select(query.source, query.criteria);
     },

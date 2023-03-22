@@ -1,15 +1,11 @@
-import type Rows from "~/types/Rows";
+import type Include from "~/types/ORM/Include";
 
 type QueryCriteria = {
     where: Array<[string, Array<string | number | Date>]>;
     order: Array<[string, "asc" | "desc"]>;
     range: [number, number] | undefined;
-    include: Array<{
-        sourceColumn: keyof Rows;
-        targetTable: string;
-        targetColumn: keyof Rows;
-        alias: string;
-    }>;
+    include: Array<Include>;
+    includeMany: Array<Include>;
 };
 
 export default QueryCriteria;
