@@ -9,8 +9,8 @@ const services = {
             count: await queries.getAllCount(table, params)
         };
     },
-    getById: async (table: string, id: string) => {
-        return await queries.getById(table, id);
+    getById: async (table: string, id: string, idColumn: string) => {
+        return await queries.getById(table, id, idColumn);
     }
 };
 

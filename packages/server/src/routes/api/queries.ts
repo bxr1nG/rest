@@ -24,8 +24,10 @@ const queries = {
         const query = builder.build();
         return await ORM.selectCount(query.source, query.criteria);
     },
-    getById: async (table: string, id: string) => {
-        const query = ORM.for(table).where("id = ?", [id]).build();
+    getById: async (table: string, id: string, idColumn: string) => {
+        const query = ORM.for(table)
+            .where("? = ?", [idColumn, `"${id}"`])
+            .build();
         return await ORM.select(query.source, query.criteria);
     }
 };

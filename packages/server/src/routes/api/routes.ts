@@ -14,9 +14,13 @@ router
             .then((result) => res.status(200).json(result))
             .catch((error) => next(error));
     })
-    .get("/:table/:id", (req, res, next) => {
+    .get("/:table/:id/:idColumn?", (req, res, next) => {
         controllers
-            .getById(req.params.table, req.params.id)
+            .getById(
+                req.params.table,
+                req.params.id,
+                req.params.idColumn || "id"
+            )
             .then((result) => res.status(200).json(result))
             .catch((error) => next(error));
     });
