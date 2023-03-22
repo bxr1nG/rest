@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Input, Button, Space } from "antd";
+import React from "react";
+import { Button, Space } from "antd";
 import {
     ArrowLeftOutlined,
     HomeOutlined,
@@ -12,58 +12,37 @@ import useViewport from "~/hooks/useViewport";
 
 import { styles } from "./constants";
 
-const { Search } = Input;
-
 type ControllersProps = {
-    params: Params;
     setParams: React.Dispatch<React.SetStateAction<Params>>;
 };
 
 const Controllers: React.FC<ControllersProps> = (props) => {
-    const { params, setParams } = props;
+    const { setParams } = props;
 
     const { isMobile } = useViewport();
-
-    const [searchValue, setSearchValue] = useState<string | undefined>();
-
-    const onSearch = (value: string) => {
-        setParams((prevState) => ({ ...prevState, search: value, page: 0 }));
-    };
 
     const onResetAll = () => {
         setParams((prevState) => ({
             ...prevState,
-            page: 0,
-            search: undefined,
-            order: undefined,
-            sort: undefined
+            range: [prevState.range[0], 0],
+            sort: undefined,
+            filter: undefined
         }));
-        setSearchValue("");
     };
 
     return isMobile ? (
-        <>
-            <Space style={styles.mobileSpace}>
-                <Link to="/">
-                    <Button
-                        type="primary"
-                        icon={<HomeOutlined />}
-                    />
-                </Link>
+        <Space style={isMobile && styles.mobileSpace}>
+            <Link to="/">
                 <Button
-                    onClick={onResetAll}
-                    icon={<DeleteOutlined />}
+                    type="primary"
+                    icon={<HomeOutlined />}
                 />
-            </Space>
-            <Search
-                placeholder="Search"
-                defaultValue={params.search}
-                allowClear
-                onSearch={onSearch}
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
+            </Link>
+            <Button
+                onClick={onResetAll}
+                icon={<DeleteOutlined />}
             />
-        </>
+        </Space>
     ) : (
         <Space>
             <Link to="/">
@@ -74,14 +53,6 @@ const Controllers: React.FC<ControllersProps> = (props) => {
                     Home
                 </Button>
             </Link>
-            <Search
-                placeholder="Search"
-                defaultValue={params.search}
-                allowClear
-                onSearch={onSearch}
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-            />
             <Button onClick={onResetAll}>Reset all</Button>
         </Space>
     );

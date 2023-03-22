@@ -1,9 +1,12 @@
+import type Data from "./Data";
+import type Include from "./Include";
+
 type Params = {
-    page: number;
-    limit: number;
-    search: string | undefined;
-    sort: string | undefined;
-    order: string | undefined;
+    range: [number, number];
+    sort?: Array<[keyof Data, "asc" | "desc"]>;
+    filter?: Array<[string, Array<string | number | Date>]>;
+    include?: Array<Include>;
+    includeMany?: Array<Include>;
 };
 
 export default Params;

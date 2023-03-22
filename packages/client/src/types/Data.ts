@@ -1,3 +1,3 @@
-type Data = { id: number } & Record<string, unknown>;
+type Data = Record<string, unknown>;
 
 export default Data;

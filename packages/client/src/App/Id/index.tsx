@@ -26,7 +26,7 @@ const Id: React.FC<IdProps> = () => {
     const navigate = useNavigate();
 
     const { isFetching, data } = useQuery({
-        queryKey: [table, id],
+        queryKey: [table, id, idColumn],
         queryFn: async () => {
             const response = await axios.get(
                 idColumn

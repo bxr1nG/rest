@@ -1,5 +1,4 @@
 import type { PaginationProps, TableProps as AntTableProps } from "antd";
-import type { SorterResult } from "antd/es/table/interface";
 
 import React, { useState } from "react";
 import { Table as AntTable, Pagination, Button } from "antd";
@@ -11,6 +10,7 @@ import axios from "axios";
 import type DataObject from "~/types/DataObject";
 import type Data from "~/types/Data";
 import type Params from "~/types/Params";
+import type Include from "~/types/Include";
 import Wrapper from "~/components/Wrapper";
 import useViewport from "~/hooks/useViewport";
 
@@ -28,36 +28,57 @@ const Table: React.FC<TableProps> = () => {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const parsedSearchParams = {
-        page: searchParams.get("page"),
-        limit: searchParams.get("limit"),
-        search: searchParams.get("search"),
+        range: searchParams.get("range"),
         sort: searchParams.get("sort"),
-        order: searchParams.get("order")
+        filter: searchParams.get("filter"),
+        include: searchParams.get("include"),
+        includeMany: searchParams.get("includeMany")
     };
     const [params, setParams] = useState<Params>({
-        page: parsedSearchParams.page ? +parsedSearchParams.page : 0,
-        limit: parsedSearchParams.limit ? +parsedSearchParams.limit : 10,
-        search: parsedSearchParams.search ?? undefined,
-        sort: parsedSearchParams.sort ?? undefined,
-        order: parsedSearchParams.order ?? undefined
+        range: parsedSearchParams.range
+            ? (JSON.parse(parsedSearchParams.range) as [number, number])
+            : [10, 0],
+        sort: parsedSearchParams.sort
+            ? (JSON.parse(parsedSearchParams.sort) as Array<
+                  [string, "asc" | "desc"]
+              >)
+            : undefined,
+        filter: parsedSearchParams.filter
+            ? (JSON.parse(parsedSearchParams.filter) as Array<
+                  [string, (string | number | Date)[]]
+              >)
+            : undefined,
+        include: parsedSearchParams.include
+            ? (JSON.parse(parsedSearchParams.include) as Array<Include>)
+            : undefined,
+        includeMany: parsedSearchParams.includeMany
+            ? (JSON.parse(parsedSearchParams.includeMany) as Array<Include>)
+            : undefined
     });
 
     const { isFetching, data } = useQuery({
         queryKey: [table, params],
         queryFn: async () => {
-            setSearchParams({
+            const newSearchParams = {
                 ...{
-                    page: params.page.toString(),
-                    limit: params.limit.toString()
+                    range: JSON.stringify(params.range)
                 },
-                ...(params.search ? { search: params.search } : {}),
-                ...(params.sort ? { sort: params.sort } : {}),
-                ...(params.order ? { order: params.order } : {})
-            });
+                ...(params.sort ? { sort: JSON.stringify(params.sort) } : {}),
+                ...(params.filter
+                    ? { filter: JSON.stringify(params.filter) }
+                    : {}),
+                ...(params.include
+                    ? { include: JSON.stringify(params.include) }
+                    : {}),
+                ...(params.includeMany
+                    ? { includeMany: JSON.stringify(params.includeMany) }
+                    : {})
+            };
+            setSearchParams(newSearchParams);
             const fields: Array<string> = Object.keys(data?.data[0] ?? {});
             const response = await axios.get(`/api/${table}`, {
                 params: {
-                    ...params,
+                    ...newSearchParams,
                     fields
                 }
             });
@@ -67,14 +88,17 @@ const Table: React.FC<TableProps> = () => {
     });
 
     const onPaginationChange: PaginationProps["onChange"] = (page) => {
-        setParams((prevState) => ({ ...prevState, page: page - 1 }));
+        setParams((prevState) => ({
+            ...prevState,
+            range: [prevState.range[0], prevState.range[0] * (page - 1)]
+        }));
     };
 
     const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
         _current,
         pageSize
     ) => {
-        setParams((prevState) => ({ ...prevState, limit: pageSize, page: 0 }));
+        setParams((prevState) => ({ ...prevState, range: [pageSize, 0] }));
     };
 
     const onTableChange: AntTableProps<Data>["onChange"] = (
@@ -82,31 +106,38 @@ const Table: React.FC<TableProps> = () => {
         _filters,
         sorter
     ) => {
-        const { order, field, column } = sorter as SorterResult<Data>;
         setParams((prevState) => ({
             ...prevState,
-            sort: column ? (field as string) : undefined,
-            order: order ? (order === "ascend" ? "ASC" : "DESC") : undefined,
-            page: 0
+            sort: Array.isArray(sorter)
+                ? sorter.map((sort) => [
+                      sort.field as keyof Data,
+                      sort.order === "ascend" ? "asc" : "desc"
+                  ])
+                : sorter.order
+                ? [
+                      [
+                          sorter.field as keyof Data,
+                          sorter.order === "ascend" ? "asc" : "desc"
+                      ]
+                  ]
+                : undefined,
+            range: [prevState.range[0], 0]
         }));
     };
 
     return (
         <Wrapper>
-            <Controllers
-                params={params}
-                setParams={setParams}
-            />
+            <Controllers setParams={setParams} />
             <AntTable
                 dataSource={data?.data}
                 pagination={false}
-                rowKey="id"
+                rowKey={Object.keys(data?.data[0] || { id: 0 })[0]}
                 loading={isFetching}
                 onChange={onTableChange}
                 style={styles.table}
                 size={isMobile ? "small" : "large"}
             >
-                {Object.keys(data?.data[0] ?? {}).map((column) => (
+                {Object.keys(data?.data[0] ?? {}).map((column, index) => (
                     <Column
                         title={column
                             .replace(/_/g, " ")
@@ -116,19 +147,37 @@ const Table: React.FC<TableProps> = () => {
                         dataIndex={column}
                         key={column}
                         showSorterTooltip={false}
-                        sorter
+                        sorter={{
+                            multiple: index + 1
+                        }}
                         sortOrder={
-                            params.sort === column
-                                ? params.order === "ASC"
-                                    ? "ascend"
-                                    : "descend"
+                            params.sort
+                                ? params.sort.filter(
+                                      (sort) => sort[0] === column
+                                  ).length
+                                    ? (
+                                          params.sort.filter(
+                                              (sort) => sort[0] === column
+                                          )[0] as [string, "asc" | "desc"]
+                                      )[1] === "asc"
+                                        ? "ascend"
+                                        : "descend"
+                                    : undefined
                                 : undefined
                         }
                     />
                 ))}
                 <Column
-                    render={({ id }: Data) => (
-                        <Link to={`/${table}/${id}`}>
+                    render={(data: Data) => (
+                        <Link
+                            to={`/${table}/${
+                                data[Object.keys(data)[0] as string] as string
+                            }${
+                                Object.keys(data)[0] === "id"
+                                    ? ""
+                                    : `/${Object.keys(data)[0] as string}`
+                            }`}
+                        >
                             <Button
                                 shape="circle"
                                 icon={<ArrowRightOutlined />}
@@ -140,8 +189,8 @@ const Table: React.FC<TableProps> = () => {
             <Pagination
                 showSizeChanger
                 onShowSizeChange={onShowSizeChange}
-                pageSize={params.limit}
-                current={params.page + 1}
+                pageSize={params.range[0]}
+                current={params.range[1] / params.range[0] + 1}
                 onChange={onPaginationChange}
                 total={data?.count}
                 style={
