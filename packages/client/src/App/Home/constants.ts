@@ -4,7 +4,10 @@ export const styles: Record<string, CSSProperties> = {
     input: {
         maxWidth: 150
     },
-    inputNumber: {
+    inputId: {
         maxWidth: 100
+    },
+    marginZero: {
+        margin: 0
     }
 };

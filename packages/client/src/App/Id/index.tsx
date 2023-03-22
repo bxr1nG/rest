@@ -18,13 +18,21 @@ type IdProps = Record<string, never>;
 const Id: React.FC<IdProps> = () => {
     const { isMobile } = useViewport();
 
-    const { table, id } = useParams() as { table: string; id: string };
+    const { table, id, idColumn } = useParams() as {
+        table: string;
+        id: string;
+        idColumn: string | undefined;
+    };
     const navigate = useNavigate();
 
     const { isFetching, data } = useQuery({
         queryKey: [table, id],
         queryFn: async () => {
-            const response = await axios.get(`/api/${table}/${id}`);
+            const response = await axios.get(
+                idColumn
+                    ? `/api/${table}/${id}/${idColumn}`
+                    : `/api/${table}/${id}`
+            );
             const data = response.data as Data;
             return Object.keys(data).map((key) => ({
                 name: key,

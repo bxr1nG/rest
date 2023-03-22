@@ -43,7 +43,7 @@ const App: React.FC<AppProps> = () => {
                     element={<Table />}
                 />
                 <Route
-                    path="/:table/:id"
+                    path="/:table/:id/:idColumn?"
                     element={<Id />}
                 />
             </Routes>

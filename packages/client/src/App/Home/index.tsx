@@ -19,9 +19,19 @@ const Home: React.FC<HomeProps> = (props) => {
 
     const navigate = useNavigate();
 
-    const onFinish = (values: { table: string; id: string | undefined }) => {
-        const { table, id } = values;
-        navigate(id ? `/${table}/${id}` : `/${table}`);
+    const onFinish = (values: {
+        table: string;
+        id: string | undefined;
+        idColumn: string | undefined;
+    }) => {
+        const { table, id, idColumn } = values;
+        navigate(
+            id
+                ? idColumn
+                    ? `/${table}/${id}/${idColumn}`
+                    : `/${table}/${id}`
+                : `/${table}`
+        );
     };
 
     return (
@@ -48,12 +58,26 @@ const Home: React.FC<HomeProps> = (props) => {
                             style={styles.input}
                         />
                     </Form.Item>
-                    <Form.Item name="id">
-                        <Input
-                            placeholder="id"
-                            style={styles.inputNumber}
-                        />
-                    </Form.Item>
+                    <Space
+                        direction="vertical"
+                        size={0}
+                    >
+                        <Form.Item
+                            name="id"
+                            style={styles.marginZero}
+                        >
+                            <Input
+                                placeholder="id"
+                                style={styles.inputId}
+                            />
+                        </Form.Item>
+                        <Form.Item name="idColumn">
+                            <Input
+                                placeholder="idColumn"
+                                style={styles.inputId}
+                            />
+                        </Form.Item>
+                    </Space>
                     <Form.Item>
                         <Button
                             type="primary"
