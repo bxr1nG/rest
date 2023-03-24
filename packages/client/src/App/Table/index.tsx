@@ -88,6 +88,18 @@ const Table: React.FC<TableProps> = () => {
             <Controllers
                 params={params}
                 setParams={setParams}
+                fields={
+                    isError
+                        ? undefined
+                        : data?.data[0]
+                        ? Object.keys(data?.data[0]).filter(
+                              (key) =>
+                                  data?.data[0] &&
+                                  data?.data[0][key] !==
+                                      Object(data?.data[0][key])
+                          )
+                        : undefined
+                }
             />
             <AntTable
                 dataSource={isError ? undefined : data?.data}

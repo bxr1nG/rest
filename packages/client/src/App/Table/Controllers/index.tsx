@@ -4,6 +4,7 @@ import {
     ArrowLeftOutlined,
     HomeOutlined,
     DeleteOutlined,
+    FilterOutlined,
     PlusCircleOutlined
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
@@ -11,16 +12,18 @@ import { Link } from "react-router-dom";
 import type Params from "~/types/Params";
 import useViewport from "~/hooks/useViewport";
 
-import { styles } from "./constants";
 import Includes from "./Includes";
+import Filters from "./Filters";
+import { styles } from "./constants";
 
 type ControllersProps = {
     params: Params;
     setParams: React.Dispatch<React.SetStateAction<Params>>;
+    fields: Array<string> | undefined;
 };
 
 const Controllers: React.FC<ControllersProps> = (props) => {
-    const { params, setParams } = props;
+    const { params, setParams, fields } = props;
 
     const { isMobile } = useViewport();
 
@@ -41,6 +44,12 @@ const Controllers: React.FC<ControllersProps> = (props) => {
         setOpenIncludes(true);
     };
 
+    const [openFilters, setOpenFilters] = useState(false);
+
+    const showFilters = () => {
+        setOpenFilters(true);
+    };
+
     return (
         <>
             {isMobile ? (
@@ -52,6 +61,10 @@ const Controllers: React.FC<ControllersProps> = (props) => {
                         />
                     </Link>
                     <Space>
+                        <Button
+                            onClick={showFilters}
+                            icon={<FilterOutlined />}
+                        />
                         <Button
                             onClick={showIncludes}
                             icon={<PlusCircleOutlined />}
@@ -78,6 +91,12 @@ const Controllers: React.FC<ControllersProps> = (props) => {
                         </Button>
                     </Link>
                     <Button
+                        onClick={showFilters}
+                        icon={<FilterOutlined />}
+                    >
+                        Filters
+                    </Button>
+                    <Button
                         onClick={showIncludes}
                         icon={<PlusCircleOutlined />}
                     >
@@ -99,6 +118,13 @@ const Controllers: React.FC<ControllersProps> = (props) => {
                 setParams={setParams}
                 open={openIncludes}
                 setOpen={setOpenIncludes}
+            />
+            <Filters
+                params={params}
+                setParams={setParams}
+                open={openFilters}
+                setOpen={setOpenFilters}
+                fields={fields}
             />
         </>
     );

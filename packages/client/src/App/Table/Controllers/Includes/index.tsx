@@ -137,7 +137,7 @@ const Includes: React.FC<IncludesProps> = (props) => {
                 {!!params.include &&
                     params.include.map((include, index) => (
                         <Card
-                            key={index}
+                            key={`one-${index}`}
                             size="small"
                             title={include.alias || include.targetTable}
                             extra={[
@@ -184,7 +184,7 @@ const Includes: React.FC<IncludesProps> = (props) => {
                 {!!params.includeMany &&
                     params.includeMany.map((include, index) => (
                         <Card
-                            key={index}
+                            key={`many-${index}`}
                             size="small"
                             title={include.alias || include.targetTable}
                             extra={[
