@@ -1,11 +1,11 @@
 import type { TableProps as AntTableProps } from "antd";
 
 import React from "react";
-import { Table as AntTable, Button } from "antd";
+import { Table as AntTable, Button, notification } from "antd";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import type DataObject from "~/types/DataObject";
 import type Data from "~/types/Data";
@@ -29,15 +29,31 @@ const Table: React.FC<TableProps> = () => {
     const { params, setParams } = useParsedSearchParams();
     const { isMobile } = useViewport();
 
+    const [api, contextHolder] = notification.useNotification();
+
+    const openNotification = (message: string, description?: string) => {
+        api.error({
+            message,
+            description
+        });
+    };
+
     const { table } = useParams() as { table: string };
 
-    const { isFetching, data } = useQuery({
+    const { isFetching, isError, data } = useQuery({
         queryKey: [table, params],
         queryFn: async () => {
             const response = await axios.get(`/api/${table}`, {
                 params: stringifySearchParams(params)
             });
             return response.data as DataObject;
+        },
+        onError: (err) => {
+            if (err instanceof AxiosError) {
+                openNotification(err.name, err.message);
+            } else {
+                openNotification("Unknown error");
+            }
         },
         keepPreviousData: true
     });
@@ -68,12 +84,13 @@ const Table: React.FC<TableProps> = () => {
 
     return (
         <Wrapper>
+            {contextHolder}
             <Controllers
                 params={params}
                 setParams={setParams}
             />
             <AntTable
-                dataSource={data?.data}
+                dataSource={isError ? undefined : data?.data}
                 pagination={false}
                 rowKey={Object.keys(data?.data[0] || {})[0]}
                 loading={isFetching}
