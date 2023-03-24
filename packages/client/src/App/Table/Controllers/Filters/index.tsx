@@ -57,7 +57,7 @@ const Filters: React.FC<FiltersProps> = (props) => {
         } else if (values.type === "more") {
             expression = `${values.field} > ?`;
         } else if (values.type === "equal") {
-            expression = `${values.field} = ?`;
+            expression = `${values.field} = '?'`;
         } else if (values.type === "like") {
             expression = `${values.field} LIKE '%?%'`;
         }
