@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.2](https://github.com/bxr1nG/rest/compare/v0.0.1...v0.0.2) (2023-03-24)
+
+
+### Features
+
+* **client:** add filters ([35c8a25](https://github.com/bxr1nG/rest/commit/35c8a25b9b540e62f05cf51f921bcd6d9831c678))
+* **client:** add includes ([22d844b](https://github.com/bxr1nG/rest/commit/22d844b435b1050b8d638a1bace06ea058cf6a7c))
+* **server:** add include support for ORM queries ([812d4c6](https://github.com/bxr1nG/rest/commit/812d4c6a28306a2b4405805396f8ffd836979c96))
+* **server:** add ORM for creating queries ([6cc6137](https://github.com/bxr1nG/rest/commit/6cc61370412e0459ba51711d3344f0f7bbca0e7e))
+
+
+### Bug Fixes
+
+* **client/table:** remove sticky header due to columns width ([9d1189d](https://github.com/bxr1nG/rest/commit/9d1189d4bdd2d0a32fc845ce60cd31d5c0be6c2c))
+* **client:** add ability to use custom id column ([0d6ce1d](https://github.com/bxr1nG/rest/commit/0d6ce1df8a833f02c5c9fff5e7dd84fa99348de6))
+* **client:** add error notifications ([d80c768](https://github.com/bxr1nG/rest/commit/d80c768339716c367f16eabf1c0f9ee23fda9b47))
+* **client:** add range and sort URL params ([bcb41e7](https://github.com/bxr1nG/rest/commit/bcb41e7a79d0af5a037c05e95a2840d41092f522))
+* **client:** add responsibility ([f29c0b7](https://github.com/bxr1nG/rest/commit/f29c0b721b8a0a9a8201075b6a8ddd528dec3ce4))
+* **client:** add theme switch ([c1d5687](https://github.com/bxr1nG/rest/commit/c1d5687c93f4137c103f81a1a5c0dfbc5faea63d))
+* **client:** add useViewport hook ([9764307](https://github.com/bxr1nG/rest/commit/97643074179a08129d23bb01866845474f1a7249))
+* **client:** fix equal filter ([b0045d6](https://github.com/bxr1nG/rest/commit/b0045d600ee30262182a35c123a56b5494778d79))
+* **client:** fix remove many include ([1cf750b](https://github.com/bxr1nG/rest/commit/1cf750bbf1c4f250ec3e94a541a6c2113f212106))
+* **server/api:** add ability to use custom id column ([f963c66](https://github.com/bxr1nG/rest/commit/f963c6662fd5956a82313659dce344ab22c35cb9))
+* **server:** add recursive include ([1a7d3e5](https://github.com/bxr1nG/rest/commit/1a7d3e535299c2d4cff074304eb1a877c11bd512))
+
+
+### Docs
+
+* **dockerhub.md:** add readme for dockerhub ([5829a08](https://github.com/bxr1nG/rest/commit/5829a0855238c6a292f4f70693f69a6151009d04))
+
 ### 0.0.1 (2023-03-15)
 
 
