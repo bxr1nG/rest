@@ -192,7 +192,7 @@ const Includes: React.FC<IncludesProps> = (props) => {
                                     title="Are you sure to remove this include?"
                                     description="Remove include"
                                     onConfirm={() =>
-                                        removeInclude(include, false)
+                                        removeInclude(include, true)
                                     }
                                     okText="Yes"
                                     cancelText="No"
