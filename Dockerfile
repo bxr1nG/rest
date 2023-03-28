@@ -15,7 +15,7 @@ RUN npm install
 COPY . .
 
 RUN npm run build &&\
-    rm -rf packages/*/src packages/*/tsconfig.json packages/client/webpack.*.ts tsconfig.json
+    rm -rf packages/*/src packages/*/tsconfig.json packages/client/webpack.*.ts packages/client/public tsconfig.json
 
 EXPOSE 80
 
