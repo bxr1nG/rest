@@ -1,9 +1,9 @@
 import type ParsedParams from "~/types/ParsedParams";
 
-import type Include from "./Include";
+import type DefaultInclude from "./DefaultInclude";
 
 type IncludeMany = {
     params?: ParsedParams;
-} & Include;
+} & DefaultInclude;
 
 export default IncludeMany;

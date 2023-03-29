@@ -1,10 +1,9 @@
-import type Rows from "~/types/Rows";
+import type IncludeParams from "~/types/IncludeParams";
+
+import type DefaultInclude from "./DefaultInclude";
 
 type Include = {
-    sourceColumn: keyof Rows;
-    targetTable: string;
-    targetColumn: keyof Rows;
-    alias?: string;
-};
+    params?: IncludeParams;
+} & DefaultInclude;
 
 export default Include;
