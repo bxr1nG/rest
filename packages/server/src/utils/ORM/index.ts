@@ -5,6 +5,7 @@ import type Count from "~/types/Count";
 import type Rows from "~/types/Rows";
 import type CountRows from "~/types/CountRows";
 import type Include from "~/types/ORM/Include";
+import type IncludeMany from "~/types/ORM/IncludeMany";
 import type ParsedParams from "~/types/ParsedParams";
 import db from "~/db";
 
@@ -18,12 +19,18 @@ class ORM {
 
     static async select<T extends Data & Record<string, Data>>(
         source: QuerySource,
-        criteria?: QueryCriteria
+        criteria?: QueryCriteria,
+        isBasis?: boolean
     ) {
         let query = `SELECT * FROM ${source.table}`;
         if (criteria) {
-            query = `${query} ${this.parseCriteria(criteria)}`;
+            query = `${query}\n${this.parseCriteria(criteria)}`;
         }
+
+        if (isBasis) {
+            console.info(query);
+        }
+
         let result = (await db.execute<T[]>(query))[0];
 
         if (criteria && criteria.include) {
@@ -31,11 +38,7 @@ class ORM {
         }
 
         if (criteria && criteria.includeMany) {
-            result = await this.addInclude<T>(
-                result,
-                criteria.includeMany,
-                true
-            );
+            result = await this.addIncludeMany<T>(result, criteria.includeMany);
         }
 
         return result;
@@ -87,26 +90,56 @@ class ORM {
                     });
                     return expression;
                 })
-                .join(" AND ");
-            query = `${query} WHERE ${conditions}`;
+                .join("\n\t  AND ");
+            query = `${query}\tWHERE ${conditions}`;
         }
         if (criteria.order.length) {
             const orders = criteria.order
                 .map(([column, order]) => `${column} ${order}`)
-                .join(", ");
-            query = `${query} ORDER BY ${orders}`;
+                .join(",\n\t\t ");
+            query = `${query}\n\tORDER BY ${orders}`;
         }
         if (criteria.range) {
             const [limit, offset] = criteria.range;
-            query = `${query} LIMIT ${limit} OFFSET ${offset}`;
+            query = `${query}\n\tLIMIT ${limit} OFFSET ${offset}`;
         }
         return query;
     }
 
     private static async addInclude<T extends Data & Record<string, Data>>(
         result: Array<T>,
-        includes: Array<Include>,
-        isMany?: boolean
+        includes: Array<Include> | Array<IncludeMany>
+    ): Promise<Array<T>> {
+        const resultWithInclude: Array<T> = [];
+
+        for (let row of result) {
+            for (const include of includes) {
+                const subbuilder = ORM.for(include.targetTable).where("? = ?", [
+                    include.targetColumn,
+                    row[include.sourceColumn] as T[keyof T]
+                ]);
+
+                const subquery = subbuilder.build();
+                const subresult = await ORM.select(
+                    subquery.source,
+                    subquery.criteria
+                );
+
+                row = {
+                    ...row,
+                    [include.alias || include.targetTable]: subresult[0]
+                };
+            }
+
+            resultWithInclude.push(row);
+        }
+
+        return resultWithInclude;
+    }
+
+    private static async addIncludeMany<T extends Data & Record<string, Data>>(
+        result: Array<T>,
+        includes: Array<IncludeMany>
     ): Promise<Array<T>> {
         const resultWithInclude: Array<T> = [];
 
@@ -129,9 +162,7 @@ class ORM {
 
                 row = {
                     ...row,
-                    [include.alias || include.targetTable]: isMany
-                        ? subresult
-                        : subresult[0]
+                    [include.alias || include.targetTable]: subresult
                 };
             }
 

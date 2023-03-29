@@ -6,7 +6,7 @@ const queries = {
         const builder = ORM.for(table);
         ORM.connectParams(builder, params);
         const query = builder.build();
-        return await ORM.select(query.source, query.criteria);
+        return await ORM.select(query.source, query.criteria, true);
     },
     getAllCount: async (table: string, params: ParsedParams) => {
         const builder = ORM.for(table);
