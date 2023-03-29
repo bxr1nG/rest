@@ -24,7 +24,7 @@ class ORM {
     ) {
         let query = `SELECT * FROM ${source.table}`;
         if (criteria) {
-            query = `${query}\n${this.parseCriteria(criteria)}`;
+            query = `${query}${this.parseCriteria(criteria)}`;
         }
 
         if (isBasis) {
@@ -38,7 +38,11 @@ class ORM {
         }
 
         if (criteria && criteria.includeMany) {
-            result = await this.addIncludeMany<T>(result, criteria.includeMany);
+            result = await this.addInclude<T>(
+                result,
+                criteria.includeMany,
+                true
+            );
         }
 
         return result;
@@ -91,7 +95,7 @@ class ORM {
                     return expression;
                 })
                 .join("\n\t  AND ");
-            query = `${query}\tWHERE ${conditions}`;
+            query = `${query}\n\tWHERE ${conditions}`;
         }
         if (criteria.order.length) {
             const orders = criteria.order
@@ -108,38 +112,8 @@ class ORM {
 
     private static async addInclude<T extends Data & Record<string, Data>>(
         result: Array<T>,
-        includes: Array<Include> | Array<IncludeMany>
-    ): Promise<Array<T>> {
-        const resultWithInclude: Array<T> = [];
-
-        for (let row of result) {
-            for (const include of includes) {
-                const subbuilder = ORM.for(include.targetTable).where("? = ?", [
-                    include.targetColumn,
-                    row[include.sourceColumn] as T[keyof T]
-                ]);
-
-                const subquery = subbuilder.build();
-                const subresult = await ORM.select(
-                    subquery.source,
-                    subquery.criteria
-                );
-
-                row = {
-                    ...row,
-                    [include.alias || include.targetTable]: subresult[0]
-                };
-            }
-
-            resultWithInclude.push(row);
-        }
-
-        return resultWithInclude;
-    }
-
-    private static async addIncludeMany<T extends Data & Record<string, Data>>(
-        result: Array<T>,
-        includes: Array<IncludeMany>
+        includes: Array<Include> | Array<IncludeMany>,
+        isMany?: boolean
     ): Promise<Array<T>> {
         const resultWithInclude: Array<T> = [];
 
@@ -162,7 +136,9 @@ class ORM {
 
                 row = {
                     ...row,
-                    [include.alias || include.targetTable]: subresult
+                    [include.alias || include.targetTable]: isMany
+                        ? subresult
+                        : subresult[0]
                 };
             }
 
