@@ -8,24 +8,22 @@ import type ParsedParams from "~/types/ParsedParams";
 import type Query from "~/utils/Query";
 import Base from "~/utils/strategies/ORM/Base";
 
+import newQueryTime from "./decorators/newQueryTime";
+import measureSelectTime from "./decorators/measureSelectTime";
+import printSqlQuery from "./decorators/printSqlQuery";
+
 class Every extends Base {
+    @newQueryTime()
+    @measureSelectTime()
     public static override async select<T extends Data & Record<string, Data>>(
         source: QuerySource,
         criteria?: QueryCriteria,
         isBasis?: boolean
     ): Promise<T[]> {
         const values: Array<string> = [];
-        let query = `SELECT * FROM ${source.table}`;
-        if (criteria) {
-            query = `${query}${this.parseCriteria(criteria, values)}`;
-        }
+        const sql = this.buildSql(values, source, criteria, isBasis);
 
-        if (isBasis) {
-            console.info(values);
-            console.info(query);
-        }
-
-        let result = (await this.execute<T[]>({ sql: query, values }))[0];
+        let result = (await this.execute<T[]>({ sql, values }))[0];
 
         if (criteria && criteria.include) {
             result = await this.addInclude<T>(result, criteria.include);
@@ -40,6 +38,17 @@ class Every extends Base {
         }
 
         return result;
+    }
+    @printSqlQuery()
+    private static buildSql(
+        values: Array<string>,
+        source: QuerySource,
+        criteria?: QueryCriteria,
+        _isBasis?: boolean
+    ) {
+        return `SELECT * FROM ${source.table}${
+            criteria ? this.parseCriteria(criteria, values) : ""
+        }`;
     }
 
     public static override connectParams(

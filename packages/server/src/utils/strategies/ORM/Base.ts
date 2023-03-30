@@ -64,16 +64,16 @@ class Base {
                 .map(
                     (expressions) =>
                         `(${expressions
-                            .map((expression) => {
-                                values.push(expression[2]);
-                                if (expression[1] === "like") {
-                                    return `${expression[0]} LIKE CONCAT('%', ?, '%'`;
-                                } else if (expression[1] === "equal") {
-                                    return `${expression[0]} = ?`;
-                                } else if (expression[1] === "more") {
-                                    return `${expression[0]} > ?`;
-                                } else if (expression[1] === "less") {
-                                    return `${expression[0]} < ?`;
+                            .map(([field, type, value]) => {
+                                values.push(value);
+                                if (type === "like") {
+                                    return `${field} LIKE CONCAT('%', ?, '%'`;
+                                } else if (type === "equal") {
+                                    return `${field} = ?`;
+                                } else if (type === "more") {
+                                    return `${field} > ?`;
+                                } else if (type === "less") {
+                                    return `${field} < ?`;
                                 } else {
                                     throw new Error(
                                         "Incorrect where condition"

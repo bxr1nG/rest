@@ -51,7 +51,10 @@ module.exports = {
         "@typescript-eslint/consistent-type-imports": "error",
         quotes: ["error", "double"],
         semi: ["error", "always"],
-        "no-console": ["error", { allow: ["info", "error"] }],
+        "no-console": [
+            "error",
+            { allow: ["info", "error", "time", "timeEnd"] }
+        ],
         "import/no-unresolved": "error",
         "import/order": [
             "error",
