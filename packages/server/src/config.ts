@@ -20,6 +20,7 @@ const config = {
     isDev: process.env.NODE_ENV === "development",
     port: +(process.env.PORT || 80),
     src: __dirname,
+    ormStrategy: process.env.ORM_STRATEGY || "every",
     mySql: {
         host: process.env.MY_SQL_HOST,
         user: process.env.MY_SQL_USER,

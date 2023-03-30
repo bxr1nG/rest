@@ -1,5 +1,5 @@
 import type ParsedParams from "~/types/ParsedParams";
-import ORM from "~/utils/ORM";
+import ORM from "~/utils/strategies/ORM";
 
 const queries = {
     getAll: async (table: string, params: ParsedParams) => {
