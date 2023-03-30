@@ -1,3 +1,3 @@
-type Rows = Record<string, string | number | Date>;
+type Rows = Record<string, string>;
 
 export default Rows;

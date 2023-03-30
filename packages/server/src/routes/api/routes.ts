@@ -8,13 +8,13 @@ import controllers from "./controllers";
 const router = Router();
 
 router
-    .get("/:table", (req, res, next) => {
+    .get("/table/:table", (req, res, next) => {
         controllers
             .getAll(req.params.table, req.query as Params)
             .then((result) => res.status(200).json(result))
             .catch((error) => next(error));
     })
-    .get("/:table/:id/:idColumn?", (req, res, next) => {
+    .get("/table/:table/:id/:idColumn?", (req, res, next) => {
         controllers
             .getById(
                 req.params.table,

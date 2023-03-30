@@ -1,4 +1,4 @@
-import type { RowDataPacket } from "mysql2";
+import type { QueryOptions, RowDataPacket } from "mysql2";
 
 import type Data from "~/types/Data";
 import type QuerySource from "~/types/ORM/QuerySource";
@@ -7,8 +7,8 @@ import type Count from "~/types/Count";
 import type Rows from "~/types/Rows";
 import type CountRows from "~/types/CountRows";
 import type ParsedParams from "~/types/ParsedParams";
-import db from "~/db";
 import Query from "~/utils/Query";
+import db from "~/db";
 
 class Base {
     public static select<T extends Data & Record<string, Data>>(
@@ -35,30 +35,53 @@ class Base {
         source: QuerySource,
         criteria?: QueryCriteria
     ) {
+        const values: Array<string> = [];
         let query = `SELECT COUNT(*) FROM ${source.table}`;
         if (criteria) {
-            query = `${query} ${this.parseCriteria(criteria)}`;
+            query = `${query} ${this.parseCriteria(criteria, values)}`;
         }
         const result = (
-            (await this.execute<Count[]>(query))[0][0] as CountRows
+            (
+                await this.execute<Count[]>({ sql: query, values })
+            )[0][0] as CountRows
         )["COUNT(*)"];
         return result;
     }
 
-    protected static async execute<T extends RowDataPacket[]>(query: string) {
+    protected static async execute<T extends RowDataPacket[]>(
+        query: QueryOptions
+    ) {
         return db.execute<T>(query);
     }
 
-    protected static parseCriteria(criteria: QueryCriteria): string {
+    protected static parseCriteria(
+        criteria: QueryCriteria,
+        values: Array<string>
+    ): string {
         let query = "";
         if (criteria.where.length) {
             const conditions = criteria.where
-                .map(([expression, values]) => {
-                    values.map((value) => {
-                        expression = expression.replace("?", value.toString());
-                    });
-                    return expression;
-                })
+                .map(
+                    (expressions) =>
+                        `(${expressions
+                            .map((expression) => {
+                                values.push(expression[2]);
+                                if (expression[1] === "like") {
+                                    return `${expression[0]} LIKE CONCAT('%', ?, '%'`;
+                                } else if (expression[1] === "equal") {
+                                    return `${expression[0]} = ?`;
+                                } else if (expression[1] === "more") {
+                                    return `${expression[0]} > ?`;
+                                } else if (expression[1] === "less") {
+                                    return `${expression[0]} < ?`;
+                                } else {
+                                    throw new Error(
+                                        "Incorrect where condition"
+                                    );
+                                }
+                            })
+                            .join("\n\t   OR ")})`
+                )
                 .join("\n\t  AND ");
             query = `${query}\n\tWHERE ${conditions}`;
         }

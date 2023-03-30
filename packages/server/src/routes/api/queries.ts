@@ -11,9 +11,7 @@ const queries = {
     getAllCount: async (table: string, params: ParsedParams) => {
         const builder = ORM.for(table);
         if (params.filter) {
-            params.filter.forEach(([expression, values]) =>
-                builder.where(expression, values)
-            );
+            params.filter.forEach((expressions) => builder.where(expressions));
         }
         if (params.sort) {
             params.sort.forEach(([column, order]) =>
@@ -26,7 +24,7 @@ const queries = {
     },
     getById: async (table: string, id: string, idColumn: string) => {
         const query = ORM.for(table)
-            .where("? = ?", [idColumn, `"${id}"`])
+            .where([[idColumn, "equal", id]])
             .build();
         return await ORM.select(query.source, query.criteria);
     }

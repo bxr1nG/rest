@@ -5,9 +5,8 @@ import type Include from "~/types/ORM/Include";
 import type IncludeMany from "~/types/ORM/IncludeMany";
 import type Rows from "~/types/Rows";
 import type ParsedParams from "~/types/ParsedParams";
-import db from "~/db";
-import Base from "~/utils/strategies/ORM/Base";
 import type Query from "~/utils/Query";
+import Base from "~/utils/strategies/ORM/Base";
 
 class Every extends Base {
     public static override async select<T extends Data & Record<string, Data>>(
@@ -15,16 +14,18 @@ class Every extends Base {
         criteria?: QueryCriteria,
         isBasis?: boolean
     ): Promise<T[]> {
+        const values: Array<string> = [];
         let query = `SELECT * FROM ${source.table}`;
         if (criteria) {
-            query = `${query}${this.parseCriteria(criteria)}`;
+            query = `${query}${this.parseCriteria(criteria, values)}`;
         }
 
         if (isBasis) {
+            console.info(values);
             console.info(query);
         }
 
-        let result = (await db.execute<T[]>(query))[0];
+        let result = (await this.execute<T[]>({ sql: query, values }))[0];
 
         if (criteria && criteria.include) {
             result = await this.addInclude<T>(result, criteria.include);
@@ -46,9 +47,7 @@ class Every extends Base {
         params: ParsedParams
     ): void {
         if (params.filter) {
-            params.filter.forEach(([expression, values]) =>
-                builder.where(expression, values)
-            );
+            params.filter.forEach((expressions) => builder.where(expressions));
         }
         if (params.sort) {
             params.sort.forEach(([column, order]) =>
@@ -78,13 +77,13 @@ class Every extends Base {
 
         for (let row of result) {
             for (const include of includes) {
-                const subbuilder = this.for(include.targetTable).where(
-                    "? = ?",
+                const subbuilder = this.for(include.targetTable).where([
                     [
                         include.targetColumn,
+                        "equal",
                         row[include.sourceColumn] as T[keyof T]
                     ]
-                );
+                ]);
 
                 if (include.params) {
                     this.connectParams(subbuilder, include.params);

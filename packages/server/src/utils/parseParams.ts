@@ -11,7 +11,9 @@ const parseParams = (query: Params): ParsedParams => ({
         ? (JSON.parse(query.sort) as Array<[keyof Rows, "asc" | "desc"]>)
         : undefined,
     filter: query.filter
-        ? (JSON.parse(query.filter) as Array<[string, Array<string>]>)
+        ? (JSON.parse(query.filter) as Array<
+              Array<[string, "like" | "equal" | "more" | "less", string]>
+          >)
         : undefined,
     include: query.include
         ? (JSON.parse(query.include) as Array<Include>)

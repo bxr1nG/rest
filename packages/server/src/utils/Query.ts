@@ -3,7 +3,9 @@ import type Include from "~/types/ORM/Include";
 
 class Query<T extends Rows> {
     private readonly table: string;
-    private readonly conditions: Array<[string, Array<T[keyof T]>]>;
+    private readonly conditions: Array<
+        Array<[keyof Rows, "like" | "equal" | "more" | "less", T[keyof T]]>
+    >;
     private readonly orders: Array<[keyof T, "asc" | "desc"]>;
     private interval: [number, number] | undefined;
     private readonly includes: Array<Include>;
@@ -18,8 +20,12 @@ class Query<T extends Rows> {
         this.includesMany = [];
     }
 
-    where(expression: string, values: Array<T[keyof T]>) {
-        this.conditions.push([expression, values]);
+    where(
+        expression: Array<
+            [keyof Rows, "like" | "equal" | "more" | "less", T[keyof T]]
+        >
+    ) {
+        this.conditions.push(expression);
         return this;
     }
 

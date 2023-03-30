@@ -4,7 +4,9 @@ import type IncludeParams from "./IncludeParams";
 type ParsedParams = {
     range?: [number, number];
     sort?: Array<[keyof Rows, "asc" | "desc"]>;
-    filter?: Array<[string, Array<string | number | Date>]>;
+    filter?: Array<
+        Array<[keyof Rows, "like" | "equal" | "more" | "less", string]>
+    >;
 } & IncludeParams;
 
 export default ParsedParams;
