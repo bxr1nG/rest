@@ -1,8 +1,6 @@
 import type Data from "~/types/Data";
 import type QuerySource from "~/types/ORM/QuerySource";
 import type QueryCriteria from "~/types/ORM/QueryCriteria";
-import type Include from "~/types/ORM/Include";
-import type IncludeMany from "~/types/ORM/IncludeMany";
 import Base from "~/utils/strategies/ORM/Base";
 
 import newQueryTime from "./decorators/newQueryTime";
@@ -23,11 +21,11 @@ class Every extends Base {
         let result = (await this.execute<T[]>({ sql, values }))[0];
 
         if (criteria && criteria.include) {
-            result = await this.addInclude<T>(result, criteria.include);
+            result = await this.addBaseInclude<T>(result, criteria.include);
         }
 
         if (criteria && criteria.includeMany) {
-            result = await this.addInclude<T>(
+            result = await this.addBaseInclude<T>(
                 result,
                 criteria.includeMany,
                 true
@@ -46,47 +44,6 @@ class Every extends Base {
         return `SELECT * FROM ${source.table}${
             criteria ? this.parseCriteria(criteria, values) : ""
         }`;
-    }
-
-    private static async addInclude<T extends Data & Record<string, Data>>(
-        result: Array<T>,
-        includes: Array<Include> | Array<IncludeMany>,
-        isMany?: boolean
-    ): Promise<Array<T>> {
-        const resultWithInclude: Array<T> = [];
-
-        for (let row of result) {
-            for (const include of includes) {
-                const subbuilder = this.for(include.targetTable).where([
-                    [
-                        include.targetColumn,
-                        "equal",
-                        row[include.sourceColumn] as T[keyof T]
-                    ]
-                ]);
-
-                if (include.params) {
-                    this.connectParams(subbuilder, include.params);
-                }
-
-                const subquery = subbuilder.build();
-                const subresult = await this.select(
-                    subquery.source,
-                    subquery.criteria
-                );
-
-                row = {
-                    ...row,
-                    [include.alias || include.targetTable]: isMany
-                        ? subresult
-                        : subresult[0]
-                };
-            }
-
-            resultWithInclude.push(row);
-        }
-
-        return resultWithInclude;
     }
 }
 

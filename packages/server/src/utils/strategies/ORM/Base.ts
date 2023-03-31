@@ -7,6 +7,8 @@ import type Count from "~/types/Count";
 import type Rows from "~/types/Rows";
 import type CountRows from "~/types/CountRows";
 import type ParsedParams from "~/types/ParsedParams";
+import type Include from "~/types/ORM/Include";
+import type IncludeMany from "~/types/ORM/IncludeMany";
 import Query from "~/utils/Query";
 import db from "~/db";
 import config from "~/config";
@@ -136,6 +138,49 @@ class Base {
             query = `${query}\n\tLIMIT ${limit} OFFSET ${offset}`;
         }
         return query;
+    }
+
+    protected static async addBaseInclude<
+        T extends Data & Record<string, Data>
+    >(
+        result: Array<T>,
+        includes: Array<Include> | Array<IncludeMany>,
+        isMany?: boolean
+    ): Promise<Array<T>> {
+        const resultWithInclude: Array<T> = [];
+
+        for (let row of result) {
+            for (const include of includes) {
+                const subbuilder = this.for(include.targetTable).where([
+                    [
+                        include.targetColumn,
+                        "equal",
+                        row[include.sourceColumn] as T[keyof T]
+                    ]
+                ]);
+
+                if (include.params) {
+                    this.connectParams(subbuilder, include.params);
+                }
+
+                const subquery = subbuilder.build();
+                const subresult = await this.select(
+                    subquery.source,
+                    subquery.criteria
+                );
+
+                row = {
+                    ...row,
+                    [include.alias || include.targetTable]: isMany
+                        ? subresult
+                        : subresult[0]
+                };
+            }
+
+            resultWithInclude.push(row);
+        }
+
+        return resultWithInclude;
     }
 }
 

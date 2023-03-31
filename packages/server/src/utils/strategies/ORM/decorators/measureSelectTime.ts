@@ -8,12 +8,14 @@ function measureSelectTime() {
     ) => {
         const original = descriptor.value as typeof Every.select;
 
-        descriptor.value = function (...args: Parameters<typeof Every.select>) {
+        descriptor.value = async function (
+            ...args: Parameters<typeof Every.select>
+        ) {
             const [_1, _2, isBasis] = args;
 
             if (isBasis) {
                 console.time("Query duration");
-                const value = original.apply(this, args);
+                const value = await original.apply(this, args);
                 console.timeEnd("Query duration");
 
                 return value;

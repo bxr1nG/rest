@@ -2,7 +2,6 @@ import type Data from "~/types/Data";
 import type QuerySource from "~/types/ORM/QuerySource";
 import type QueryCriteria from "~/types/ORM/QueryCriteria";
 import type Include from "~/types/ORM/Include";
-import type IncludeMany from "~/types/ORM/IncludeMany";
 import Base from "~/utils/strategies/ORM/Base";
 
 import newQueryTime from "./decorators/newQueryTime";
@@ -27,7 +26,11 @@ class One extends Base {
         }
 
         if (criteria && criteria.includeMany) {
-            result = await this.addIncludeMany<T>(result, criteria.includeMany);
+            result = await this.addBaseInclude<T>(
+                result,
+                criteria.includeMany,
+                true
+            );
         }
 
         return result;
@@ -79,44 +82,6 @@ class One extends Base {
         }
 
         return result;
-    }
-
-    private static async addIncludeMany<T extends Data & Record<string, Data>>(
-        result: Array<T>,
-        includes: Array<IncludeMany>
-    ): Promise<Array<T>> {
-        const resultWithInclude: Array<T> = [];
-
-        for (let row of result) {
-            for (const include of includes) {
-                const subbuilder = this.for(include.targetTable).where([
-                    [
-                        include.targetColumn,
-                        "equal",
-                        row[include.sourceColumn] as T[keyof T]
-                    ]
-                ]);
-
-                if (include.params) {
-                    this.connectParams(subbuilder, include.params);
-                }
-
-                const subquery = subbuilder.build();
-                const subresult = await this.select(
-                    subquery.source,
-                    subquery.criteria
-                );
-
-                row = {
-                    ...row,
-                    [include.alias || include.targetTable]: subresult
-                };
-            }
-
-            resultWithInclude.push(row);
-        }
-
-        return resultWithInclude;
     }
 }
 
