@@ -9,6 +9,7 @@ import type CountRows from "~/types/CountRows";
 import type ParsedParams from "~/types/ParsedParams";
 import Query from "~/utils/Query";
 import db from "~/db";
+import config from "~/config";
 
 class Base {
     public static select<T extends Data & Record<string, Data>>(
@@ -65,6 +66,26 @@ class Base {
             )[0][0] as CountRows
         )["COUNT(*)"];
         return result;
+    }
+
+    public static async getTableColumns(table: string): Promise<Array<string>> {
+        const result = await this.execute<
+            [{ COLUMN_NAME: string }] & RowDataPacket[]
+        >({
+            sql: "select COLUMN_NAME from information_schema.columns where table_schema = ? and table_name = ? order by ORDINAL_POSITION",
+            values: [config.mySql.database, table]
+        });
+        return result[0].map((res) => res["COLUMN_NAME"]);
+    }
+
+    public static async getTables(): Promise<Array<string>> {
+        const result = await this.execute<
+            [{ TABLE_NAME: string }] & RowDataPacket[]
+        >({
+            sql: "select TABLE_NAME from information_schema.tables where table_schema = ?",
+            values: [config.mySql.database]
+        });
+        return result[0].map((res) => res["TABLE_NAME"]);
     }
 
     protected static async execute<T extends RowDataPacket[]>(
