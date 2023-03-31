@@ -28,7 +28,9 @@ function printSqlQuery() {
                 const value = original.apply(this, args);
 
                 console.info(`Query SQL:\n${value}`);
-                console.info(`Query params: ${values.join(", ")}`);
+                if (values.length) {
+                    console.info(`Query params: ${values.join(", ")}`);
+                }
 
                 return value;
             } else {

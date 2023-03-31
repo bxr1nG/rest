@@ -9,7 +9,7 @@ import newQueryTime from "./decorators/newQueryTime";
 import measureSelectTime from "./decorators/measureSelectTime";
 import printSqlQuery from "./decorators/printSqlQuery";
 
-class Every extends Base {
+class One extends Base {
     @newQueryTime()
     @measureSelectTime()
     public static override async select<T extends Data & Record<string, Data>>(
@@ -27,11 +27,7 @@ class Every extends Base {
         }
 
         if (criteria && criteria.includeMany) {
-            result = await this.addInclude<T>(
-                result,
-                criteria.includeMany,
-                true
-            );
+            result = await this.addIncludeMany<T>(result, criteria.includeMany);
         }
 
         return result;
@@ -50,8 +46,44 @@ class Every extends Base {
 
     private static async addInclude<T extends Data & Record<string, Data>>(
         result: Array<T>,
-        includes: Array<Include> | Array<IncludeMany>,
-        isMany?: boolean
+        includes: Array<Include>
+    ): Promise<Array<T>> {
+        for (const include of includes) {
+            const sources = result.map(
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                (row) => row[include.sourceColumn] as T[keyof T]
+            );
+
+            const subbuilder = this.for(include.targetTable).where(
+                sources.map((source) => [include.targetColumn, "equal", source])
+            );
+
+            if (include.params) {
+                this.connectParams(subbuilder, include.params);
+            }
+
+            const subquery = subbuilder.build();
+            const subresult = await this.select(
+                subquery.source,
+                subquery.criteria
+            );
+
+            result = result.map((row) => ({
+                ...row,
+                [include.alias || include.targetTable]: subresult.find(
+                    (subrow) =>
+                        subrow[include.targetColumn] ===
+                        row[include.sourceColumn]
+                )
+            }));
+        }
+
+        return result;
+    }
+
+    private static async addIncludeMany<T extends Data & Record<string, Data>>(
+        result: Array<T>,
+        includes: Array<IncludeMany>
     ): Promise<Array<T>> {
         const resultWithInclude: Array<T> = [];
 
@@ -77,9 +109,7 @@ class Every extends Base {
 
                 row = {
                     ...row,
-                    [include.alias || include.targetTable]: isMany
-                        ? subresult
-                        : subresult[0]
+                    [include.alias || include.targetTable]: subresult
                 };
             }
 
@@ -90,4 +120,4 @@ class Every extends Base {
     }
 }
 
-export default Every;
+export default One;

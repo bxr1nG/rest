@@ -20,10 +20,29 @@ class Base {
     }
 
     public static connectParams(
-        _builder: Query<Rows>,
-        _params: ParsedParams
+        builder: Query<Rows>,
+        params: ParsedParams
     ): void {
-        throw new Error("Method not implemented.");
+        if (params.filter) {
+            params.filter.forEach((expressions) => builder.where(expressions));
+        }
+        if (params.sort) {
+            params.sort.forEach(([column, order]) =>
+                builder.order(column, order)
+            );
+        }
+        if (params.range) {
+            const [limit, offset] = params.range;
+            builder.range(limit, offset);
+        }
+        if (params.include) {
+            params.include.forEach((include) => builder.include(include));
+        }
+        if (params.includeMany) {
+            params.includeMany.forEach((include) =>
+                builder.includeMany(include)
+            );
+        }
     }
 
     public static for<T extends Rows>(table: string) {
