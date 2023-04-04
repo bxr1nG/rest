@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { notificationContext } from "~/utils/NotificationProvider";
+import { notificationContext } from "~/providers/NotificationProvider";
 import onQueryError from "~/utils/OnQueryError";
 
 const useNotification = () => {

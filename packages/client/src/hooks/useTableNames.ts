@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { tableNamesContext } from "~/utils/TableNamesProvider";
+import { tableNamesContext } from "~/providers/TableNamesProvider";
 
 const useTableNames = () => {
     const tables = useContext(tableNamesContext);

@@ -115,6 +115,7 @@ const Controllers: React.FC<ControllersProps> = (props) => {
             <Includes
                 open={openIncludes}
                 setOpen={setOpenIncludes}
+                fields={fields || []}
             />
             <Filters
                 open={openFilters}

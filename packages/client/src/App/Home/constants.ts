@@ -10,7 +10,10 @@ export const styles: Record<string, CSSProperties> = {
     inputId: {
         maxWidth: 100
     },
-    marginZero: {
+    mobileInputId: {
+        width: 70
+    },
+    zeroMargin: {
         margin: 0
     }
 };

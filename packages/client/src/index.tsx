@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "antd/dist/reset.css";
 
-import ViewportProvider from "~/utils/ViewportProvider";
+import ViewportProvider from "~/providers/ViewportProvider";
 
 import App from "./App";
 

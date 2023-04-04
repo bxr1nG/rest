@@ -1,24 +1,17 @@
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useContext } from "react";
 
-import type Params from "~/types/Params";
-import {
-    parseSearchParams,
-    stringifySearchParams
-} from "~/utils/SearchParamsParser";
+import { parsedSearchParamsContext } from "~/providers/ParsedSearchParamsProvider";
 
 const useParsedSearchParams = () => {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const context = useContext(parsedSearchParamsContext);
 
-    const [params, setParams] = useState<Params>(
-        parseSearchParams(searchParams)
-    );
+    if (!context) {
+        throw new Error(
+            "No parsedSearchParamsContext.Provider found when calling useParsedSearchParams."
+        );
+    }
 
-    useEffect(() => {
-        setSearchParams(stringifySearchParams(params));
-    }, [params]);
-
-    return { params, setParams };
+    return context;
 };
 
 export default useParsedSearchParams;

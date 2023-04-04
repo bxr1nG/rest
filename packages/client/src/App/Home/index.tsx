@@ -6,6 +6,9 @@ import { useNavigate } from "react-router-dom";
 import Wrapper from "~/components/Wrapper";
 import useViewport from "~/hooks/useViewport";
 import useTableNames from "~/hooks/useTableNames";
+import useTableColumns from "~/hooks/useTableColumns";
+import autoCompleteFilter from "~/utils/autoCompleteFilter";
+import columnToObject from "~/utils/columnToObject";
 
 import { styles } from "./constants";
 
@@ -21,6 +24,7 @@ const Home: React.FC<HomeProps> = (props) => {
 
     const { isMobile } = useViewport();
     const { tables } = useTableNames();
+    const { columns, setTableName } = useTableColumns("");
 
     const navigate = useNavigate();
 
@@ -57,32 +61,35 @@ const Home: React.FC<HomeProps> = (props) => {
                         rules={[
                             { required: true, message: "Table name required" }
                         ]}
+                        style={isMobile ? styles.mobileInput : styles.input}
                     >
                         <AutoComplete
-                            options={tables.map((str) => ({
-                                value: str
-                            }))}
+                            onBlur={(e) =>
+                                setTableName(
+                                    (e.target as HTMLTextAreaElement).value
+                                )
+                            }
+                            options={tables.map(columnToObject)}
+                            filterOption={autoCompleteFilter}
                             placeholder="table"
-                            style={isMobile ? styles.mobileInput : styles.input}
                         />
                     </Form.Item>
                     <Space
                         direction="vertical"
                         size={0}
+                        style={isMobile ? styles.mobileInputId : styles.inputId}
                     >
                         <Form.Item
                             name="id"
-                            style={styles.marginZero}
+                            style={styles.zeroMargin}
                         >
-                            <Input
-                                placeholder="id"
-                                style={styles.inputId}
-                            />
+                            <Input placeholder="id" />
                         </Form.Item>
                         <Form.Item name="idColumn">
-                            <Input
+                            <AutoComplete
+                                filterOption={autoCompleteFilter}
+                                options={columns.map(columnToObject)}
                                 placeholder="idColumn"
-                                style={styles.inputId}
                             />
                         </Form.Item>
                     </Space>

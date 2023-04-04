@@ -10,22 +10,33 @@ import {
     Card,
     Space,
     Descriptions,
-    Popconfirm
+    Popconfirm,
+    AutoComplete,
+    Select
 } from "antd";
 import { PlusCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 
 import type Include from "~/types/Include";
 import useParsedSearchParams from "~/hooks/useParsedSearchParams";
+import useTableNames from "~/hooks/useTableNames";
+import useTableColumns from "~/hooks/useTableColumns";
+import autoCompleteFilter from "~/utils/autoCompleteFilter";
+import columnToObject from "~/utils/columnToObject";
+
+const { Option } = Select;
 
 type IncludesProps = {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    fields: Array<string>;
 };
 
 const Includes: React.FC<IncludesProps> = (props) => {
-    const { open, setOpen } = props;
+    const { open, setOpen, fields } = props;
 
     const { params, setParams } = useParsedSearchParams();
+    const { tables } = useTableNames();
+    const { columns, setTableName } = useTableColumns("");
 
     const [form] = Form.useForm<{
         isMany: boolean;
@@ -257,7 +268,16 @@ const Includes: React.FC<IncludesProps> = (props) => {
                             }
                         ]}
                     >
-                        <Input placeholder="Source column" />
+                        <Select placeholder="Source column">
+                            {fields.map((field) => (
+                                <Option
+                                    key={field}
+                                    value={field}
+                                >
+                                    {field}
+                                </Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                     <Form.Item
                         name="targetTable"
@@ -265,7 +285,16 @@ const Includes: React.FC<IncludesProps> = (props) => {
                             { required: true, message: "Target table required" }
                         ]}
                     >
-                        <Input placeholder="Target table" />
+                        <AutoComplete
+                            onBlur={(e) =>
+                                setTableName(
+                                    (e.target as HTMLTextAreaElement).value
+                                )
+                            }
+                            options={tables.map(columnToObject)}
+                            filterOption={autoCompleteFilter}
+                            placeholder="Target table"
+                        />
                     </Form.Item>
                     <Form.Item
                         name="targetColumn"
@@ -276,7 +305,11 @@ const Includes: React.FC<IncludesProps> = (props) => {
                             }
                         ]}
                     >
-                        <Input placeholder="Target column" />
+                        <AutoComplete
+                            filterOption={autoCompleteFilter}
+                            options={columns.map(columnToObject)}
+                            placeholder="Target column"
+                        />
                     </Form.Item>
                     <Form.Item name="alias">
                         <Input placeholder="Alias" />
