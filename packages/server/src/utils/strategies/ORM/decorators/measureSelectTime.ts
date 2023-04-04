@@ -14,9 +14,11 @@ function measureSelectTime() {
             const [_1, _2, isBasis] = args;
 
             if (isBasis) {
-                console.time("Query duration");
+                const start = process.hrtime();
                 const value = await original.apply(this, args);
-                console.timeEnd("Query duration");
+                const end = process.hrtime(start);
+                const time = (end[0] * 1000000000 + end[1]) / 1000000; // convert first to ns then to ms
+                console.info(`Query duration: ${time}ms`);
 
                 return value;
             } else {
