@@ -109,7 +109,7 @@ class Base {
                             .map(([field, type, value]) => {
                                 values.push(value);
                                 if (type === "like") {
-                                    return `${field} LIKE CONCAT('%', ?, '%'`;
+                                    return `${field} LIKE CONCAT('%', ?, '%')`;
                                 } else if (type === "equal") {
                                     return `${field} = ?`;
                                 } else if (type === "more") {
