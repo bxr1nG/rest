@@ -1,20 +1,11 @@
 import React from "react";
-import {
-    AutoComplete,
-    Button,
-    Form,
-    Input,
-    notification,
-    Space,
-    Switch
-} from "antd";
+import { AutoComplete, Button, Form, Input, Space, Switch } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
 
 import Wrapper from "~/components/Wrapper";
 import useViewport from "~/hooks/useViewport";
+import useTableNames from "~/hooks/useTableNames";
 
 import { styles } from "./constants";
 
@@ -27,18 +18,11 @@ type HomeProps = {
 
 const Home: React.FC<HomeProps> = (props) => {
     const { handleThemeChange, isDarkMode } = props;
+
     const { isMobile } = useViewport();
+    const { tables } = useTableNames();
 
     const navigate = useNavigate();
-
-    const [api, contextHolder] = notification.useNotification();
-
-    const openNotification = (message: string, description?: string) => {
-        api.error({
-            message,
-            description
-        });
-    };
 
     const onFinish = (values: {
         table: string;
@@ -55,30 +39,8 @@ const Home: React.FC<HomeProps> = (props) => {
         );
     };
 
-    const { data } = useQuery({
-        queryKey: [],
-        queryFn: async () => {
-            const response = await axios.get("/api/tables");
-            return response.data as Array<string>;
-        },
-        onError: (err) => {
-            if (err instanceof AxiosError) {
-                const data = err.response?.data as {
-                    message: string;
-                    status: number;
-                    stack?: string;
-                };
-                console.info(data);
-                openNotification(`${data.status} ${data.message}`);
-            } else {
-                openNotification("Unknown error");
-            }
-        }
-    });
-
     return (
         <Wrapper center>
-            {contextHolder}
             <Switch
                 checkedChildren={"Dark Theme"}
                 unCheckedChildren={"Light Theme"}
@@ -97,7 +59,7 @@ const Home: React.FC<HomeProps> = (props) => {
                         ]}
                     >
                         <AutoComplete
-                            options={(data || []).map((str) => ({
+                            options={tables.map((str) => ({
                                 value: str
                             }))}
                             placeholder="table"

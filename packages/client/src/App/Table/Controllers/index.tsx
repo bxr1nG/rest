@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
-import type Params from "~/types/Params";
+import useParsedSearchParams from "~/hooks/useParsedSearchParams";
 import useViewport from "~/hooks/useViewport";
 
 import Includes from "./Includes";
@@ -17,14 +17,13 @@ import Filters from "./Filters";
 import { styles } from "./constants";
 
 type ControllersProps = {
-    params: Params;
-    setParams: React.Dispatch<React.SetStateAction<Params>>;
     fields: Array<string> | undefined;
 };
 
 const Controllers: React.FC<ControllersProps> = (props) => {
-    const { params, setParams, fields } = props;
+    const { fields } = props;
 
+    const { setParams } = useParsedSearchParams();
     const { isMobile } = useViewport();
 
     const onResetAll = () => {
@@ -53,7 +52,7 @@ const Controllers: React.FC<ControllersProps> = (props) => {
     return (
         <>
             {isMobile ? (
-                <Space style={isMobile && styles.mobileSpace}>
+                <Space style={styles.mobileSpace}>
                     <Link to="/">
                         <Button
                             type="primary"
@@ -114,14 +113,10 @@ const Controllers: React.FC<ControllersProps> = (props) => {
                 </Space>
             )}
             <Includes
-                params={params}
-                setParams={setParams}
                 open={openIncludes}
                 setOpen={setOpenIncludes}
             />
             <Filters
-                params={params}
-                setParams={setParams}
                 open={openFilters}
                 setOpen={setOpenFilters}
                 fields={fields}

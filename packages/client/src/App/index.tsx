@@ -3,6 +3,8 @@ import { Route, Routes } from "react-router-dom";
 import { ConfigProvider, theme } from "antd";
 
 import useLocalStorage from "~/hooks/useLocalStorage";
+import NotificationProvider from "~/utils/NotificationProvider";
+import TableNamesProvider from "~/utils/TableNamesProvider";
 
 import Home from "./Home";
 import Table from "./Table";
@@ -28,25 +30,29 @@ const App: React.FC<AppProps> = () => {
                 }
             }}
         >
-            <Routes>
-                <Route
-                    path="/"
-                    element={
-                        <Home
-                            handleThemeChange={handleThemeChange}
-                            isDarkMode={isDarkMode}
+            <NotificationProvider>
+                <TableNamesProvider>
+                    <Routes>
+                        <Route
+                            path="/"
+                            element={
+                                <Home
+                                    handleThemeChange={handleThemeChange}
+                                    isDarkMode={isDarkMode}
+                                />
+                            }
                         />
-                    }
-                />
-                <Route
-                    path="/:table"
-                    element={<Table />}
-                />
-                <Route
-                    path="/:table/:id/:idColumn?"
-                    element={<Id />}
-                />
-            </Routes>
+                        <Route
+                            path="/:table"
+                            element={<Table />}
+                        />
+                        <Route
+                            path="/:table/:id/:idColumn?"
+                            element={<Id />}
+                        />
+                    </Routes>
+                </TableNamesProvider>
+            </NotificationProvider>
         </ConfigProvider>
     );
 };

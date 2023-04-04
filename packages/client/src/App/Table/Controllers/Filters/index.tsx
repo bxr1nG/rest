@@ -14,22 +14,22 @@ import {
 } from "antd";
 import { PlusCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 
-import type Params from "~/types/Params";
+import useParsedSearchParams from "~/hooks/useParsedSearchParams";
 
 import { filterFilters } from "./helpers";
 
 const { Option } = Select;
 
 type FiltersProps = {
-    params: Params;
-    setParams: React.Dispatch<React.SetStateAction<Params>>;
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     fields: Array<string> | undefined;
 };
 
 const Filters: React.FC<FiltersProps> = (props) => {
-    const { params, setParams, open, setOpen, fields } = props;
+    const { open, setOpen, fields } = props;
+
+    const { params, setParams } = useParsedSearchParams();
 
     const [form] = Form.useForm<{
         field: string;

@@ -14,18 +14,18 @@ import {
 } from "antd";
 import { PlusCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 
-import type Params from "~/types/Params";
 import type Include from "~/types/Include";
+import useParsedSearchParams from "~/hooks/useParsedSearchParams";
 
 type IncludesProps = {
-    params: Params;
-    setParams: React.Dispatch<React.SetStateAction<Params>>;
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const Includes: React.FC<IncludesProps> = (props) => {
-    const { params, setParams, open, setOpen } = props;
+    const { open, setOpen } = props;
+
+    const { params, setParams } = useParsedSearchParams();
 
     const [form] = Form.useForm<{
         isMany: boolean;

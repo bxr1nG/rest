@@ -1,17 +1,18 @@
 import type { TableProps as AntTableProps } from "antd";
 
 import React from "react";
-import { Table as AntTable, Button, notification } from "antd";
+import { Table as AntTable, Button } from "antd";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 import type DataObject from "~/types/DataObject";
 import type Data from "~/types/Data";
 import Wrapper from "~/components/Wrapper";
 import useViewport from "~/hooks/useViewport";
 import useParsedSearchParams from "~/hooks/useParsedSearchParams";
+import useNotification from "~/hooks/useNotification";
 import { stringifySearchParams } from "~/utils/SearchParamsParser";
 import ColumnTitleParser from "~/utils/ColumnTitleParser";
 
@@ -28,15 +29,7 @@ type TableProps = Record<string, never>;
 const Table: React.FC<TableProps> = () => {
     const { params, setParams } = useParsedSearchParams();
     const { isMobile } = useViewport();
-
-    const [api, contextHolder] = notification.useNotification();
-
-    const openNotification = (message: string, description?: string) => {
-        api.error({
-            message,
-            description
-        });
-    };
+    const { onError } = useNotification();
 
     const { table } = useParams() as { table: string };
 
@@ -48,19 +41,7 @@ const Table: React.FC<TableProps> = () => {
             });
             return response.data as DataObject;
         },
-        onError: (err) => {
-            if (err instanceof AxiosError) {
-                const data = err.response?.data as {
-                    message: string;
-                    status: number;
-                    stack?: string;
-                };
-                console.info(data);
-                openNotification(`${data.status} ${data.message}`);
-            } else {
-                openNotification("Unknown error");
-            }
-        },
+        onError,
         keepPreviousData: true
     });
 
@@ -90,10 +71,7 @@ const Table: React.FC<TableProps> = () => {
 
     return (
         <Wrapper>
-            {contextHolder}
             <Controllers
-                params={params}
-                setParams={setParams}
                 fields={
                     isError
                         ? undefined

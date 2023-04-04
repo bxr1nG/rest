@@ -1,13 +1,14 @@
 import React from "react";
-import { Table, Button, notification } from "antd";
+import { Table, Button } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 import type Data from "~/types/Data";
 import Wrapper from "~/components/Wrapper";
 import useViewport from "~/hooks/useViewport";
+import useNotification from "~/hooks/useNotification";
 
 import { styles } from "./constants";
 
@@ -17,15 +18,7 @@ type IdProps = Record<string, never>;
 
 const Id: React.FC<IdProps> = () => {
     const { isMobile } = useViewport();
-
-    const [api, contextHolder] = notification.useNotification();
-
-    const openNotification = (message: string, description?: string) => {
-        api.error({
-            message,
-            description
-        });
-    };
+    const { onError } = useNotification();
 
     const { table, id, idColumn } = useParams() as {
         table: string;
@@ -48,25 +41,11 @@ const Id: React.FC<IdProps> = () => {
                 value: data[key]
             }));
         },
-        onError: (err) => {
-            if (err instanceof AxiosError) {
-                const data = err.response?.data as {
-                    message: string;
-                    status: number;
-                    stack?: string;
-                };
-                console.info(data);
-                openNotification(`${data.status} ${data.message}`);
-            } else {
-                openNotification("Unknown error");
-            }
-        },
-        keepPreviousData: true
+        onError
     });
 
     return (
         <Wrapper>
-            {contextHolder}
             <Button
                 type="primary"
                 icon={<ArrowLeftOutlined />}
