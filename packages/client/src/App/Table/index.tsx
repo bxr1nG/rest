@@ -50,7 +50,13 @@ const Table: React.FC<TableProps> = () => {
         },
         onError: (err) => {
             if (err instanceof AxiosError) {
-                openNotification(err.name, err.message);
+                const data = err.response?.data as {
+                    message: string;
+                    status: number;
+                    stack?: string;
+                };
+                console.info(data);
+                openNotification(`${data.status} ${data.message}`);
             } else {
                 openNotification("Unknown error");
             }

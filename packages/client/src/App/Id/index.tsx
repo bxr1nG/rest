@@ -39,8 +39,8 @@ const Id: React.FC<IdProps> = () => {
         queryFn: async () => {
             const response = await axios.get(
                 idColumn
-                    ? `/api/${table}/${id}/${idColumn}`
-                    : `/api/${table}/${id}`
+                    ? `/api/table/${table}/${id}/${idColumn}`
+                    : `/api/table/${table}/${id}`
             );
             const data = response.data as Data;
             return Object.keys(data).map((key) => ({
@@ -50,7 +50,13 @@ const Id: React.FC<IdProps> = () => {
         },
         onError: (err) => {
             if (err instanceof AxiosError) {
-                openNotification(err.name, err.message);
+                const data = err.response?.data as {
+                    message: string;
+                    status: number;
+                    stack?: string;
+                };
+                console.info(data);
+                openNotification(`${data.status} ${data.message}`);
             } else {
                 openNotification("Unknown error");
             }
