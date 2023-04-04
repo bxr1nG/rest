@@ -16,6 +16,8 @@ import { PlusCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 
 import type Params from "~/types/Params";
 
+import { filterFilters } from "./helpers";
+
 const { Option } = Select;
 
 type FiltersProps = {
@@ -31,8 +33,8 @@ const Filters: React.FC<FiltersProps> = (props) => {
 
     const [form] = Form.useForm<{
         field: string;
-        type: string;
-        value: string | number | Date;
+        type: "like" | "equal" | "more" | "less";
+        value: string;
     }>();
 
     const onClose = () => {
@@ -47,27 +49,15 @@ const Filters: React.FC<FiltersProps> = (props) => {
 
     const handleSubmit = (values: {
         field: string;
-        type: string;
-        value: string | number | Date;
+        type: "like" | "equal" | "more" | "less";
+        value: string;
     }) => {
-        let expression = "";
-
-        if (values.type === "less") {
-            expression = `${values.field} < ?`;
-        } else if (values.type === "more") {
-            expression = `${values.field} > ?`;
-        } else if (values.type === "equal") {
-            expression = `${values.field} = '?'`;
-        } else if (values.type === "like") {
-            expression = `${values.field} LIKE '%?%'`;
-        }
+        const newFilter: [string, "like" | "equal" | "more" | "less", string] =
+            [values.field, values.type, values.value];
 
         setParams((prevState) => ({
             ...prevState,
-            filter: [
-                ...(prevState.filter ? prevState.filter : []),
-                [expression, [values.value]]
-            ]
+            filter: [...(prevState.filter ? prevState.filter : []), [newFilter]]
         }));
 
         form.resetFields();
@@ -79,17 +69,16 @@ const Filters: React.FC<FiltersProps> = (props) => {
         setIsModalOpen(false);
     };
 
-    const removeFilter = (filter: [string, Array<string | number | Date>]) => {
+    const removeFilter = (
+        filter: [string, "like" | "equal" | "more" | "less", string]
+    ) => {
         setParams((prevState) => ({
             ...prevState,
-            filter:
-                prevState.filter && prevState.filter.length > 1
-                    ? prevState.filter.filter(
-                          (currentFilter) =>
-                              JSON.stringify(currentFilter) !==
-                              JSON.stringify(filter)
-                      )
+            filter: prevState.filter
+                ? filterFilters(prevState.filter, filter).length
+                    ? filterFilters(prevState.filter, filter)
                     : undefined
+                : undefined
         }));
     };
 
@@ -114,36 +103,45 @@ const Filters: React.FC<FiltersProps> = (props) => {
                 </Button>
 
                 {!!params.filter &&
-                    params.filter.map((filter, index) => (
-                        <Card
-                            key={index}
-                            size="small"
-                            title={filter[0]}
-                            extra={[
-                                <Popconfirm
-                                    title="Are you sure to remove this filter?"
-                                    description="Remove filter"
-                                    onConfirm={() => removeFilter(filter)}
-                                    okText="Yes"
-                                    cancelText="No"
-                                    key="delete"
+                    params.filter.map((filterArray, index) => (
+                        <div key={index}>
+                            {filterArray.map((filter, index) => (
+                                <Card
+                                    key={index}
+                                    size="small"
+                                    title={filter[0]}
+                                    extra={[
+                                        <Popconfirm
+                                            title="Are you sure to remove this filter?"
+                                            description="Remove filter"
+                                            onConfirm={() =>
+                                                removeFilter(filter)
+                                            }
+                                            okText="Yes"
+                                            cancelText="No"
+                                            key="delete"
+                                        >
+                                            <Button
+                                                type="link"
+                                                icon={<DeleteOutlined />}
+                                            />{" "}
+                                        </Popconfirm>
+                                    ]}
                                 >
-                                    <Button
-                                        type="link"
-                                        icon={<DeleteOutlined />}
-                                    />{" "}
-                                </Popconfirm>
-                            ]}
-                        >
-                            <Descriptions
-                                size="small"
-                                column={1}
-                            >
-                                <Descriptions.Item label="Value">
-                                    {filter[1].toString()}
-                                </Descriptions.Item>
-                            </Descriptions>
-                        </Card>
+                                    <Descriptions
+                                        size="small"
+                                        column={1}
+                                    >
+                                        <Descriptions.Item label="Type">
+                                            {filter[1]}
+                                        </Descriptions.Item>
+                                        <Descriptions.Item label="Value">
+                                            {filter[2]}
+                                        </Descriptions.Item>
+                                    </Descriptions>
+                                </Card>
+                            ))}
+                        </div>
                     ))}
             </Space>
             <Modal

@@ -43,7 +43,7 @@ const Table: React.FC<TableProps> = () => {
     const { isFetching, isError, data } = useQuery({
         queryKey: [table, params],
         queryFn: async () => {
-            const response = await axios.get(`/api/${table}`, {
+            const response = await axios.get(`/api/table/${table}`, {
                 params: stringifySearchParams(params)
             });
             return response.data as DataObject;
