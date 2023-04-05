@@ -1,7 +1,5 @@
-import type { ReactNode } from "react";
-
 import React, { createContext, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Outlet, useSearchParams } from "react-router-dom";
 
 import type Params from "~/types/Params";
 import {
@@ -17,15 +15,11 @@ export const parsedSearchParamsContext = createContext<
     | undefined
 >(undefined);
 
-type ParsedSearchParamsProviderProps = {
-    children: ReactNode;
-};
+type ParsedSearchParamsProviderProps = Record<string, never>;
 
-const ParsedSearchParamsProvider: React.FC<ParsedSearchParamsProviderProps> = (
-    props
-) => {
-    const { children } = props;
-
+const ParsedSearchParamsProvider: React.FC<
+    ParsedSearchParamsProviderProps
+> = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const [params, setParams] = useState<Params>(
@@ -38,7 +32,7 @@ const ParsedSearchParamsProvider: React.FC<ParsedSearchParamsProviderProps> = (
 
     return (
         <parsedSearchParamsContext.Provider value={{ params, setParams }}>
-            {children}
+            <Outlet />
         </parsedSearchParamsContext.Provider>
     );
 };

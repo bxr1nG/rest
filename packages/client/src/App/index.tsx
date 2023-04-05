@@ -39,33 +39,31 @@ const App: React.FC<AppProps> = () => {
                     </Wrapper>
                 }
             >
-                <ParsedSearchParamsProvider>
-                    <NotificationProvider>
-                        <TableNamesProvider>
-                            <Routes>
-                                <Route
-                                    path="/"
-                                    element={
-                                        <Home
-                                            handleThemeChange={
-                                                handleThemeChange
-                                            }
-                                            isDarkMode={isDarkMode}
-                                        />
-                                    }
-                                />
+                <NotificationProvider>
+                    <TableNamesProvider>
+                        <Routes>
+                            <Route
+                                path="/"
+                                element={
+                                    <Home
+                                        handleThemeChange={handleThemeChange}
+                                        isDarkMode={isDarkMode}
+                                    />
+                                }
+                            />
+                            <Route element={<ParsedSearchParamsProvider />}>
                                 <Route
                                     path="/:table"
                                     element={<Table />}
                                 />
-                                <Route
-                                    path="/:table/:id/:idColumn?"
-                                    element={<Id />}
-                                />
-                            </Routes>
-                        </TableNamesProvider>
-                    </NotificationProvider>
-                </ParsedSearchParamsProvider>
+                            </Route>
+                            <Route
+                                path="/:table/:id/:idColumn?"
+                                element={<Id />}
+                            />
+                        </Routes>
+                    </TableNamesProvider>
+                </NotificationProvider>
             </Suspense>
         </ConfigProvider>
     );
