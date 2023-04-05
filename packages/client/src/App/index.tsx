@@ -1,15 +1,16 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import { ConfigProvider, theme } from "antd";
+import { ConfigProvider, Spin, theme } from "antd";
 
 import useLocalStorage from "~/hooks/useLocalStorage";
 import NotificationProvider from "~/providers/NotificationProvider";
 import TableNamesProvider from "~/providers/TableNamesProvider";
 import ParsedSearchParamsProvider from "~/providers/ParsedSearchParamsProvider";
+import Wrapper from "~/components/Wrapper";
 
-import Home from "./Home";
-import Table from "./Table";
-import Id from "./Id";
+const Home = lazy(() => import("./Home"));
+const Table = lazy(() => import("./Table"));
+const Id = lazy(() => import("./Id"));
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
@@ -31,31 +32,41 @@ const App: React.FC<AppProps> = () => {
                 }
             }}
         >
-            <ParsedSearchParamsProvider>
-                <NotificationProvider>
-                    <TableNamesProvider>
-                        <Routes>
-                            <Route
-                                path="/"
-                                element={
-                                    <Home
-                                        handleThemeChange={handleThemeChange}
-                                        isDarkMode={isDarkMode}
-                                    />
-                                }
-                            />
-                            <Route
-                                path="/:table"
-                                element={<Table />}
-                            />
-                            <Route
-                                path="/:table/:id/:idColumn?"
-                                element={<Id />}
-                            />
-                        </Routes>
-                    </TableNamesProvider>
-                </NotificationProvider>
-            </ParsedSearchParamsProvider>
+            <Suspense
+                fallback={
+                    <Wrapper center>
+                        <Spin />
+                    </Wrapper>
+                }
+            >
+                <ParsedSearchParamsProvider>
+                    <NotificationProvider>
+                        <TableNamesProvider>
+                            <Routes>
+                                <Route
+                                    path="/"
+                                    element={
+                                        <Home
+                                            handleThemeChange={
+                                                handleThemeChange
+                                            }
+                                            isDarkMode={isDarkMode}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/:table"
+                                    element={<Table />}
+                                />
+                                <Route
+                                    path="/:table/:id/:idColumn?"
+                                    element={<Id />}
+                                />
+                            </Routes>
+                        </TableNamesProvider>
+                    </NotificationProvider>
+                </ParsedSearchParamsProvider>
+            </Suspense>
         </ConfigProvider>
     );
 };

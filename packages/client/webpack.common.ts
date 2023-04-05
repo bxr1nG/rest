@@ -10,8 +10,8 @@ import "webpack-dev-server";
 const config: webpack.Configuration = {
     entry: "./src/index.tsx",
     output: {
-        filename: "[hash].[name].js",
-        chunkFilename: "[hash].[name].js",
+        filename: "[fullhash].[name].js",
+        chunkFilename: "[fullhash].[name].js",
         path: path.resolve(__dirname, "build")
     },
     module: {
