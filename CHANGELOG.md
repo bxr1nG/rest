@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.3](https://github.com/bxr1nG/rest/compare/v0.0.2...v0.0.3) (2023-04-05)
+
+
+### Features
+
+* **server/orm:** add logging decorators ([3ea2fae](https://github.com/bxr1nG/rest/commit/3ea2fae50a36f0c89813abe47ffdcf7406d0f79a))
+* **server/orm:** add methods to get database tables and table columns ([307898f](https://github.com/bxr1nG/rest/commit/307898f58232a40cc2acf663a796372c805087c8))
+* **server/orm:** add ORM strategy that uses join for include ([914243e](https://github.com/bxr1nG/rest/commit/914243ea4a2d451ecaad013a80bcb0e3dad7dd7e))
+* **server/orm:** add ORM strategy that uses one query per include ([8e0de91](https://github.com/bxr1nG/rest/commit/8e0de91c230c90a792feeb91121c23d9b277922d))
+* **server/orm:** add strategy for ORM ([1c3344c](https://github.com/bxr1nG/rest/commit/1c3344cc63885a4a628b614264e40b53fb467eb2))
+* **server:** add api docs in swagger ([ef207be](https://github.com/bxr1nG/rest/commit/ef207be7a98b5400599e7784c022eca62eb40aae))
+* **server:** add routes for database tables and table columns ([e61441b](https://github.com/bxr1nG/rest/commit/e61441be9b791788b3f497af432a81c05ab8da1f))
+
+
+### Bug Fixes
+
+* **client:** add autocomplete for table and column fields ([0ae8006](https://github.com/bxr1nG/rest/commit/0ae8006e04088d4407ae5843516cd6179ea56919))
+* **client:** add dropdown to select table ([94fb606](https://github.com/bxr1nG/rest/commit/94fb606685dd8a417273ad1e1d48ac2f94d8ad2a))
+* **client:** add favicon, add public folder remove in Dockerfile ([e3eeeae](https://github.com/bxr1nG/rest/commit/e3eeeae7de3ed91275c54f3e0c6b339a047c9407))
+* **client:** fix error messages ([195d7c9](https://github.com/bxr1nG/rest/commit/195d7c9ad35324ea48fe3a1a6996188b48367983))
+* **client:** fix filter type ([3a13db5](https://github.com/bxr1nG/rest/commit/3a13db5f7f981a81b9d80376fca2e628aa803b1b))
+* **client:** fix ParsedSearchParamsProvider ([f2f7c1b](https://github.com/bxr1nG/rest/commit/f2f7c1b81a99a21e87ff6c7065a4471e39ebdc62))
+* **client:** fix webpack "size exceeds limit" error ([9f9de8c](https://github.com/bxr1nG/rest/commit/9f9de8c2d0874caca45400ac5395ec3741ab7a27))
+* **client:** refactor code ([301ac4a](https://github.com/bxr1nG/rest/commit/301ac4a3960dff8949700ca479aa379160e04ce6))
+* **server/orm:** fix concat statement ([bf2c54e](https://github.com/bxr1nG/rest/commit/bf2c54e72842c118bf8ae24b98060ef0c6f717c8))
+* **server/orm:** fix query log ([100f51f](https://github.com/bxr1nG/rest/commit/100f51f08bda07df901a8072c41d1596478e761b))
+* **server/orm:** fix time measuring decorator ([80c85b6](https://github.com/bxr1nG/rest/commit/80c85b6cdc7465d5deb249a16c95da82423b51d6))
+* **server/orm:** refactor include method, fix time mesuring decorator ([3589541](https://github.com/bxr1nG/rest/commit/35895416885eba68ea029bb24c3c2e037b174f26))
+* **server/orm:** use sql params for where section ([c6b5f2c](https://github.com/bxr1nG/rest/commit/c6b5f2cf0d386e8e8b18c72bcbb6c45062f353be))
+* **server/tsconfig.json:** remove package.json from include ([2226f8a](https://github.com/bxr1nG/rest/commit/2226f8a936aab5a16df20b634a35cbc5056922fc))
+* **server/types:** fix include params types ([8bb16f4](https://github.com/bxr1nG/rest/commit/8bb16f4c7ad6e969cac33d759481b4fe9da2956a))
+* **server:** fix swagger doc ([dd4f4d3](https://github.com/bxr1nG/rest/commit/dd4f4d362e37eaf023da815f5538c464bf8e85da))
+* **server:** remove params property from Include type ([096131b](https://github.com/bxr1nG/rest/commit/096131bd62a12b7870405f3b88d47cbcb54c1cca))
+
 ### [0.0.2](https://github.com/bxr1nG/rest/compare/v0.0.1...v0.0.2) (2023-03-24)
 
 
