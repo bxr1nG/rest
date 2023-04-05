@@ -14,7 +14,7 @@
         "removeComments": true,
         "experimentalDecorators": true
     },
-    "include": ["src"],
+    "include": ["src", "../../package.json"],
     "exclude": ["node_modules", "build"],
     "ts-node": {
         "esm": true
