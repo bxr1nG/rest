@@ -18,7 +18,7 @@ const options: swaggerJSDoc.Options = {
             version
         }
     },
-    apis: ["./src/routes/api/routes.ts", "./src/types/**/*.ts"]
+    apis: [path.resolve(__dirname, "../routes/api/routes.*")]
 };
 
 const swaggerSpec = swaggerJSDoc(options);

@@ -280,4 +280,35 @@ export default router;
  *         success: false
  *         status: 500
  *         message: "Table 'somedb.sometable' doesn't exist"
+ *
+ *     TableRowData:
+ *       type: object
+ *       additionalProperties:
+ *         anyOf:
+ *           - type: string
+ *           - type: number
+ *           - type: boolean
+ *           - type: null
+ *       example:
+ *         id: 1337
+ *         name: John Doe
+ *
+ *     TableRowDataWithIncludes:
+ *       type: object
+ *       additionalProperties:
+ *         anyOf:
+ *           - type: string
+ *           - type: number
+ *           - type: boolean
+ *           - type: null
+ *           - type: array
+ *             items:
+ *               $ref: "#/components/schemas/TableRowDataWithIncludes"
+ *       example:
+ *         id: 1337
+ *         name: John Doe
+ *         address:
+ *           country: USA
+ *           town: Anytown
+ *           street: 123 Maple Street
  */
